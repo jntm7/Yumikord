@@ -16,7 +16,7 @@ Place your Discord token into the [.env file](main/.env).
 
 ## Step 4:
 
-Invite your bot to desired Discord server using the **OAuth2 URL Generator** on the **Discord Developer Portal**.
+Invite your bot to desired Discord server using the **OAuth2 URL Generator** on the **Discord Developer Portal**　under Settings.
 
 ## Step 5:
 
