@@ -8,21 +8,32 @@ If you do not already have a Discord account, sign up [here](https://discord.com
 
 ## Step 2:
 
-Find your Discord token within the Application tab of **Discord Developer Portal**.
+Obtain your **Discord token** by:
+- Navigate to the `Discord Developer Portal > Settings > Bot.`
+- Under `Username`, there should be a `Reset Token` button.
+- Before resetting, scroll down to `Privileged Gateway Intents`
+- Assign the bot `MESSAGE CONTENT INTENT` (and `SERVER MEMBERS INTENT` if you choose to).
+- Click `Reset Token` and complete 2FA if it is enabled on your Discord account.
 
 ## Step 3:
 
-Place your Discord token into the [.env file](main/.env).
+Place your Discord token into the [**.env file**](main/.env).
+
+Keep this token secure and refrain from sharing it with anyone. 
+
+However, you can always reset the token, just remember to replace the `DISCORD_TOKEN` value in [.env file](main/.env).
 
 ## Step 4:
 
-Invite your bot to desired Discord server using the **OAuth2 URL Generator** on the Discord Developer Portal under Settings.
+Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
+- Navigate to `Discord Developer Portal > Settings > OAuth2`.
+- Check off the "bot" scope under **OAuth2 URL Generator**
 
 ## Step 5:
 
-Run [main.py](main/main.py) in IDE or code editor of your choice (i.e. VSCode) to launch the bot.
+Run [**main.py**](main/main.py) in IDE or code editor of your choice (such as VSCode) to launch the bot.
 
-If there are no errors, the message such as `"YOURBOTNAME has connected successfully."` should be shown in the terminal.
+If there are no errors, a message such as `"YOURBOTNAME has connected successfully."` should be shown in the terminal.
 
 ## Step 6:
 
