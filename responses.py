@@ -32,9 +32,8 @@ def flip_coin() -> str:
 # Calculator
 def calculator(user+input: str) -> str:
     tokens = user_input.split()
-
     if len(tokens) != 3 ## len = length of a sequence
-        return "Please provide a function in the format of <number> <operator> <number>"
+        return 'Please provide a function in the format of <number> <operator> <number>'
     try:
         x = float(tokens[0])
         operator = tokens[1]
@@ -49,14 +48,14 @@ def calculator(user+input: str) -> str:
         elif operator == '/':
             # if user tries to divide by zero
             if y == 0: 
-                return "Division by zero is not possible."
+                return 'Division by zero is not possible.'
             result = x / y
         else:
-            return "Please enter one of the following operators: +, -, *, /."
+            return 'Please enter one of the following operators: +, -, *, /.'
         return f'Result: {result}'
     # If user enters invalid float
     except ValueError:
-        return "Please enter valid numbers for calculation."
+        return 'Please enter valid numbers for calculation.'
         
 #Response to an unsupported message
 def choose_random_response(user_input: str) -> str:
