@@ -50,7 +50,7 @@ def calculator(user+input: str) -> str:
             # if user tries to divide by zero
             if y == 0: 
                 return "Division by zero is not possible."
-            result = num1 / num2
+            result = x / y
         else:
             return "Please enter one of the following operators: +, -, *, /."
         return f'Result: {result}'
