@@ -53,3 +53,4 @@ Terminate the instance once you want to stop, and the bot should display as offl
 - how are you
 - roll a dice
 - flip a coin
+- calculate (addition, subtraction, multiplication, division)
