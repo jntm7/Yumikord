@@ -6,7 +6,7 @@ from typing import Final
 def get_response(user_input: str) -> str:
     lowered: str = user_input.lower()
     
-    if lowered == '': #Response to no message sent
+    if lowered == '': # Response to no message sent
         return 'Well, this is awkward...'  
     elif 'hello' in lowered:
         return 'Hello there!'
@@ -15,11 +15,15 @@ def get_response(user_input: str) -> str:
     elif 'roll a dice' in lowered:
         return f'You rolled: {roll_dice()}'
     elif 'flip a coin' in lowered:
-        return f'You got: {flip_coin(user_input)}'
+        return f'You got: {flip_coin()}'
     elif 'calculate' in lowered:
-        return calculator(lowered)
+        expression = lowered.replace('calculate', '', 1).strip()
+        if validate_expression(expression):
+            return f'The answer is: {calculator(expression)}'
+        else:
+            return 'Please provide a valid calculation expression.'
     else:
-        return choose_random_response(lowered)  
+        return choose_random_response(lowered)      
 
 # Roll a dice
 def roll_dice() -> int:
@@ -27,37 +31,46 @@ def roll_dice() -> int:
 
 # Flip a coin
 def flip_coin() -> str:
-    result = random.choice(['heads', 'tails'])
+    return random.choice(['heads', 'tails'])
 
 # Calculator
-def calculator(user+input: str) -> str:
+def calculator(user_input: str) -> str:
     tokens = user_input.split()
-    if len(tokens) != 3 ## len = length of a sequence
-        return 'Please provide a function in the format of <number> <operator> <number>'
     try:
-        x = float(tokens[0])
-        operator = tokens[1]
-        y = float(tokens[2])
-        #Operations
+        num1 = float(tokens[0])
+        operator = tokens[1]    
+        num2 = float(tokens[2])
+
+        # Operations
         if operator == '+':
-            result = x + y
+            result = num1 + num2
         elif operator == '-':
-            result = x - y
+            result = num1 - num2
         elif operator == '*':
-            result = x * y
+            result = num1 * num2
         elif operator == '/':
             # if user tries to divide by zero
-            if y == 0: 
+            if num2 == 0: 
                 return 'Division by zero is not possible.'
-            result = x / y
+            result = num1 / num2
         else:
             return 'Please enter one of the following operators: +, -, *, /.'
-        return f'Result: {result}'
-    # If user enters invalid float
+
+        # Integer or Float output depending on input
+        if isinstance(num1, int) and isinstance(num2, int): 
+            return f'{int(result)}'  # Return integer result
+        else:
+            return f'{result}'  # Return float result
+
+    # if user enters invalid float
     except ValueError:
         return 'Please enter valid numbers for calculation.'
-        
-#Response to an unsupported message
+
+def validate_expression(expression: str) -> bool:
+    # Validates if the expression contains at least one number and one operator
+    return any(char.isdigit() for char in expression) and any(char in expression for char in ['+', '-', '*', '/'])
+
+# Response to an unsupported message
 def choose_random_response(user_input: str) -> str:
     responses: Final[str] = [
         'I do not quite understand...',
