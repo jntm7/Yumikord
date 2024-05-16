@@ -2,9 +2,12 @@
 
 ## Step 1: 
 
-Create a bot on [**Discord Developer Portal**](https://discord.com/developers/applications).
-
 If you do not already have a Discord account, sign up [here](https://discord.com/register).
+
+Create an application on [**Discord Developer Portal**](https://discord.com/developers/applications).
+
+- Under `Discord Developer Portal > Applications`, click `New Application`and assign a `Name`.
+- Under `Discord Developer Portal > Settings > General Information`, assign a `Description`, and `App Icon` for your application.
 
 ## Step 2:
 
@@ -21,14 +24,14 @@ Place your Discord token into the [**.env file**](main/.env).
 
 Keep this token secure and refrain from sharing it with anyone. 
 
-However, you can always reset the token, just remember to replace the `DISCORD_TOKEN` value in [.env file](main/.env).
+However, you can always reset the token, just remember to replace the `DISCORD_TOKEN` value in the [.env file](main/.env).
 
 ## Step 4:
 
 Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 - Navigate to `Discord Developer Portal > Settings > OAuth2`.
-- Check off the `bot` scope under **OAuth2 URL Generator**
-- Under `Bot Permissions`, assign the bot **all the text permissions** and any others that you may want.
+- Under `OAuth2 URL Generator`, assign the `bot` scope.
+- Under `Bot Permissions`, assign the bot **all the text permissions**, plus any others that you may want.
 
 ## Step 5:
 
