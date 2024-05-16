@@ -2,7 +2,9 @@
 
 ## Step 1: 
 
-Create a bot on **Discord Developer Portal** [https://discord.com/developers/applications]
+Create a bot on [**Discord Developer Portal**](https://discord.com/developers/applications).
+
+If you do not already have a Discord account, sign up [here](https://discord.com/register).
 
 ## Step 2:
 
@@ -10,7 +12,7 @@ Find your Discord token within the Application tab of **Discord Developer Portal
 
 ## Step 3:
 
-Create a new {token.md} file.
+Place your Discord token into the [.env file].
 
 ## Step 4:
 
