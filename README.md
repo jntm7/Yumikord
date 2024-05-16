@@ -27,7 +27,8 @@ However, you can always reset the token, just remember to replace the `DISCORD_T
 
 Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 - Navigate to `Discord Developer Portal > Settings > OAuth2`.
-- Check off the "bot" scope under **OAuth2 URL Generator**
+- Check off the `bot` scope under **OAuth2 URL Generator**
+- Under `Bot Permissions`, assign the bot **all the text permissions** and any others that you may want.
 
 ## Step 5:
 
