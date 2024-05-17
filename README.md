@@ -20,7 +20,7 @@ Obtain your **Discord token** by:
 
 ## Step 3:
 
-Place your Discord token into the [**.env file**](main/.env).
+Place your Discord token into the `DISCORD_TOKEN` line, found inside the [**.env file**](main/.env).
 
 Keep this token secure and refrain from sharing it with anyone. 
 
