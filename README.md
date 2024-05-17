@@ -41,7 +41,7 @@ If there are no errors, the message `"YOURBOTNAME is now running!"` should be sh
 
 ## Step 6:
 
-Send a message (in all lowercase) in any Discord channel within the Discord server you had invited the bot to.
+Send a message (in all lowercase) in any Discord channel within the Discord server you had invited the bot to. This message should be replicated in the terminal in the format `[channel] user: "message"`.
 
 As this is a local operation, you must keep the terminal instance running to keep the bot working. 
 
@@ -49,10 +49,10 @@ Terminate the instance once you want to stop, and the bot should display as offl
 
 ### Current Bot Commands:
 
-- hello
-- how are you
-- roll a dice
-- flip a coin
-- calculate (addition, subtraction, multiplication, division)
-- time in (city)
-
+- `hello`
+- `how are you`
+- `roll a dice`
+- `flip a coin`
+- `calculate`: addition, subtraction, multiplication, division
+- `time in (city)` [Thanks to WorldTimeAPI!](https://worldtimeapi.org)
+    - [complete supported list of timezones and cities](https://worldtimeapi.org/api/timezone/)
