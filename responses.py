@@ -1,6 +1,8 @@
 import random
 from random import choice, randint
 from typing import Final
+import requests
+from datetime import datetime
 
 # Responses
 def get_response(user_input: str) -> str:
@@ -21,7 +23,13 @@ def get_response(user_input: str) -> str:
         if validate_expression(expression):
             return f'The answer is: {calculator(expression)}'
         else:
-            return 'Please provide a valid calculation expression.'
+            return 'Please enter a valid calculation expression.'
+    elif 'time in' in lowered: # New command to display current time in any city
+         city = lowered.replace('time in', '', 1).strip()
+         if city:
+            return get_current_time(city)
+         else:
+             return 'Please enter a valid city name.'
     else:
         return choose_random_response(lowered)      
 
@@ -54,7 +62,7 @@ def calculator(user_input: str) -> str:
                 return 'Division by zero is not possible.'
             result = num1 / num2
         else:
-            return 'Please enter one of the following operators: +, -, *, /.'
+            return 'Please enter a valid operator: +, -, *, /.'
 
         # Integer or Float output depending on input
         if isinstance(num1, int) and isinstance(num2, int): 
@@ -69,6 +77,17 @@ def calculator(user_input: str) -> str:
 def validate_expression(expression: str) -> bool:
     # Validates if the expression contains at least one number and one operator
     return any(char.isdigit() for char in expression) and any(char in expression for char in ['+', '-', '*', '/'])
+
+# World Time API
+def get_current_time(city):
+    try:
+        response = requests.get(f'https://worldtimeapi.org/api/timezone/{city}')
+        data = response.json()
+        datetime_object = datetime.fromisoformat(data['datetime'])
+        current_time = datetime_object.strftime('%I:%M %p')
+        return f'The current time in {city} is: {current_time}'
+    except Exception as e:
+        return 'An error occurred while fetching the data.'
 
 # Response to an unsupported message
 def choose_random_response(user_input: str) -> str:
