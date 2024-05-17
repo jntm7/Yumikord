@@ -37,7 +37,7 @@ Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 
 Run [**main.py**](main/main.py) in IDE or code editor of your choice (such as VSCode) to launch the bot.
 
-If there are no errors, a message such as `"YOURBOTNAME has connected successfully."` should be shown in the terminal.
+If there are no errors, the message `"YOURBOTNAME is now running!"` should be shown in the terminal.
 
 ## Step 6:
 
@@ -54,3 +54,5 @@ Terminate the instance once you want to stop, and the bot should display as offl
 - roll a dice
 - flip a coin
 - calculate (addition, subtraction, multiplication, division)
+- time in (city)
+

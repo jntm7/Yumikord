@@ -3,28 +3,35 @@ from random import choice, randint
 from typing import Final
 import requests
 from datetime import datetime
+from fuzzywuzzy import process
 
 # Responses
 def get_response(user_input: str) -> str:
     lowered: str = user_input.lower()
-    
-    if lowered == '': # Response to no message sent
-        return 'Well, this is awkward...'  
+    # no message
+    if lowered == '':
+        return 'Well, this is awkward...'
+    # hello  
     elif 'hello' in lowered:
         return 'Hello there!'
+    # how are you
     elif 'how are you' in lowered:
         return 'Great, thanks!'
+    # roll dice
     elif 'roll a dice' in lowered:
         return f'You rolled: {roll_dice()}'
+    # flip coin
     elif 'flip a coin' in lowered:
         return f'You got: {flip_coin()}'
+    # calculator
     elif 'calculate' in lowered:
         expression = lowered.replace('calculate', '', 1).strip()
         if validate_expression(expression):
             return f'The answer is: {calculator(expression)}'
         else:
             return 'Please enter a valid calculation expression.'
-    elif 'time in' in lowered: # New command to display current time in any city
+    # world timezone clock
+    elif 'time in' in lowered:
          city = lowered.replace('time in', '', 1).strip()
          if city:
             return get_current_time(city)
@@ -81,11 +88,19 @@ def validate_expression(expression: str) -> bool:
 # World Time API
 def get_current_time(city):
     try:
-        response = requests.get(f'https://worldtimeapi.org/api/timezone/{city}')
+        timezones_response = requests.get(f'https://worldtimeapi.org/api/timezone')
+        timezones = timezones_response.json()
+
+        # FuzzyWuzzy allows users to input 'new york' instead of 'New_York'
+        best_match, match_score = process.extractOne(city, timezones, scorer = process.fuzz.partial_ratio)
+        if match_score < 75:
+            return 'Please enter a valid city name.'
+        
+        response = requests.get(f'https://worldtimeapi.org/api/timezone/{best_match}')
         data = response.json()
         datetime_object = datetime.fromisoformat(data['datetime'])
         current_time = datetime_object.strftime('%I:%M %p')
-        return f'The current time in {city} is: {current_time}'
+        return f'The current time in {city.title()} is: {current_time}'
     except Exception as e:
         return 'An error occurred while fetching the data.'
 
