@@ -35,14 +35,14 @@ Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 
 ## Step 5:
 
-Run [**main.py**](main/main.py) in IDE or code editor of your choice (such as VSCode) to launch the bot.
+Run [**main.py**](main/main.py) in an IDE, such as [VSCode](https://code.visualstudio.com) or [PyCharm](https://www.jetbrains.com/pycharm/download/), to launch the bot.
 
 If there are no errors, the message `"YOURBOTNAME is now running!"` should be shown in the terminal.
 
 ## Step 6:
 
 Send a message (in lowercase) in any Discord channel within the Discord server you had invited the bot to. 
-- This message should be replicated in the terminal in the format `[channel] user: "message"`.
+- This message should be replicated in the terminal as `[channel] user: "message"`.
 
 As this is a local operation, you must keep the terminal instance running to keep the bot working. 
 
