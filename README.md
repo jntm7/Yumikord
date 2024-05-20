@@ -17,35 +17,57 @@ Obtain your **Discord token** by:
 - Before resetting, scroll down to `Privileged Gateway Intents`
 - Assign the bot `MESSAGE CONTENT INTENT` (and `SERVER MEMBERS INTENT` if you choose to).
 - Click `Reset Token` and complete 2FA if it is enabled on your Discord account.
+- Copy your Discord token or come back to this step as we will need this in [Step 6](step-6). 
 
 ## Step 3:
-
-Place your Discord token into the [**.env file**](main/.env).
-
-Keep this token secure and refrain from sharing it with anyone. 
-
-However, you can always reset the token, just remember to replace the `DISCORD_TOKEN` value in the [.env file](main/.env).
-
-## Step 4:
 
 Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 - Navigate to `Discord Developer Portal > Settings > OAuth2`.
 - Under `OAuth2 URL Generator`, assign the `bot` scope.
 - Under `Bot Permissions`, assign the bot **all the text permissions**, plus any others that you may want.
 
+## Step 4:
+
+Clone this repository with your preferred version control platform (e.g. GitHub Desktop), or simply download the code as a ZIP file and extract it to your preferred directory.
+
+Ensure that you have Python installed. You can download it from the [**Python official website**](https://www.python.org/downloads/). During installation, check the option to `add Pythoon to system PATH`.
+
 ## Step 5:
 
-Run [**main.py**](main/main.py) in IDE or code editor of your choice (such as VSCode) to launch the bot.
+Before running the program, users will need to install the required dependencies found in [** requirements.txt**](main/requirements.txt)
 
-If there are no errors, the message `"YOURBOTNAME is now running!"` should be shown in the terminal.
+To do this:
+- Navigate to the directory you extracted or clone the repository.
+- Open a terminal or command prompt. This can be done by pressing `Win + R` then typing `cmd`.
+- Assuming you have Python installed from the last step, enter ```pip install -r requirements.txt```. This will install the dependencies necessary for the features of this application.
 
 ## Step 6:
 
-Send a message (in all lowercase) in any Discord channel within the Discord server you had invited the bot to. This message should be replicated in the terminal in the format `[channel] user: "message"`.
+Retrieve your Discord token from the [**Discord Developer Portal**](https://discord.com/developers/applications) that we set up in [Step 2](#step-2).
 
-As this is a local operation, you must keep the terminal instance running to keep the bot working. 
+Open [the .env file](main/.env) with a text editor (e.g. Notepad) and copy this Discord key after `DISCORD_TOKEN`.
 
-Terminate the instance once you want to stop, and the bot should display as offline in the Discord channel shortly after.
+Keep this token secure and refrain from sharing it. 
+
+However, you can always reset the token, just remember to replace the `DISCORD_TOKEN` value in the [.env file](main/.env).
+
+## Step 7:
+
+Run [**main.py**](main/main.py) in IDE or code editor of your choice (e.g. VSCode) to launch the bot.
+
+If there are no errors:
+- `"YOURBOTNAME is now running!"` should be shown in the terminal.
+- Your bot should appear as online in your Discord server.
+
+## Step 8:
+
+To interact with the bot:
+- In any channel within the invited server where the bot is present, type [commands to interact with it](#current-bot-commands).
+- Your typed message should be replicated in the terminal in the format `[channel] user: "message"`.
+
+Things to note:
+- As this is a local operation, you must keep the terminal instance running to keep the bot working. 
+- To stop, simply terminate the command prompt or terminal. Your bot will appear as offline in Discord after a while.
 
 ### Current Bot Commands:
 
@@ -55,4 +77,6 @@ Terminate the instance once you want to stop, and the bot should display as offl
 - `flip a coin`
 - `calculate`: addition, subtraction, multiplication, division
 - `time in (city)` [Thanks to WorldTimeAPI!](https://worldtimeapi.org)
-    - [complete supported list of timezones and cities](https://worldtimeapi.org/api/timezone/)
+    - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
+- `translate (text sourcelanguage targetlanguage)` [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)
+    - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
