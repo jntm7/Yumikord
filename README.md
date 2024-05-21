@@ -17,7 +17,7 @@ Obtain your **Discord token** by:
 - Before resetting, scroll down to `Privileged Gateway Intents`
 - Assign the bot `MESSAGE CONTENT INTENT` (and `SERVER MEMBERS INTENT` if you choose to).
 - Click `Reset Token` and complete 2FA if it is enabled on your Discord account.
-- Copy your Discord token or come back to this step as we will need this in [Step 6](step-6). 
+- Copy your Discord token or come back to this step as we will need this in [Step 6](https://github.com/jntm7/discord-chatbot-catto?tab=readme-ov-file#step-6). 
 
 ## Step 3:
 
@@ -45,7 +45,7 @@ To do this:
 
 Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in [Step 2](#step-2).
 
-Open [the .env file](main/.env) with a text editor (e.g. Notepad) and copy this Discord key after `DISCORD_TOKEN`.
+Open the [.env file](main/.env) with a text editor (e.g. Notepad) and copy this Discord key after `DISCORD_TOKEN`.
 
 Keep this token secure and refrain from sharing it. 
 
@@ -83,7 +83,8 @@ Things to note:
         - division
 - `time in (city)` [Thanks to WorldTimeAPI!](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
-- `translate (text sourcelanguage targetlanguage)` [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)
+- `translate (text sourcelanguage targetlanguage)`
+    - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
     - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
 - `convert`: 
     - supported unit pairs (with their associated abbreviations):
