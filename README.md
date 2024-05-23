@@ -101,32 +101,32 @@ Things to note:
 
 ### Calculator
 
-``` calcualte 9 + 10```
-``` calculate 7 - 4```
-``` calculate 3 x 5 ```
-``` calculate 10 / 2```
+- ```calcualte 9 + 10```
+- ```calculate 7 - 4```
+- ```calculate 3 x 5 ```
+- ```calculate 10 / 2```
 
 ### World Clock
 
-``` time in Tokyo```
-``` time in London```
-``` time in Shanghai```
-``` time in New York```
+- ```time in Tokyo```
+- ```time in London```
+- ```time in Shanghai```
+- ```time in New York```
 
 ### Translator
 
-``` translate apple en fr``` translate apple in English to French
-``` translate ありがとう jp es``` translate thank you in Japanese to Spanish
-``` translate krapfen de zh-CN``` translate donut in German to Chinese
+- ```translate apple en fr``` translate apple in English to French
+- ```translate ありがとう jp es``` translate thank you in Japanese to Spanish
+- ```translate krapfen de zh-CN``` translate donut in German to Chinese
 
 ### Unit Converter
 
-``` convert 10 mi km``` convert 10 miles to kilometres
-``` convert 6 ft m```   convert 6 feet to metres
-``` convert 12 in cm``` convert 12 inches to centimetres
-``` convert 45 lb kg``` convert 45 pounds to kilograms
+- ```convert 10 mi km``` convert 10 miles to kilometres
+- ```convert 6 ft m```   convert 6 feet to metres
+- ```convert 12 in cm``` convert 12 inches to centimetres
+- ```convert 45 lb kg``` convert 45 pounds to kilograms
 
 ### Temperature Converter
 
-``` convert 15 c f``` convert 15 Celsius to Fahrenheit
-``` convert 85 f c``` convert 85 Fahrenheit to Celsius
+```convert 15 c f``` convert 15 Celsius to Fahrenheit
+```convert 85 f c``` convert 85 Fahrenheit to Celsius
