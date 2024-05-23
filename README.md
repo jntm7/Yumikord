@@ -81,7 +81,8 @@ Things to note:
         - subtraction
         - multiplication
         - division
-- `time in (city)` [Thanks to WorldTimeAPI!](https://worldtimeapi.org)
+- `time in (city)`
+    - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
 - `translate (text sourcelanguage targetlanguage)`
     - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
