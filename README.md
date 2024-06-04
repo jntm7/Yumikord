@@ -1,7 +1,5 @@
 # Yumikord
-Elevate your Discord community with this versatile and multifunctional bot!
-
-![image](https://pbs.twimg.com/profile_images/1681943599930552320/7cT6pXvp_400x400.jpg)
+Elevate your Discord community with Yumiko - a versatile and multifunctional bot!
 
 ## Installation & Setup
 
