@@ -106,9 +106,9 @@ Things to note:
 
 ### Fun
 
-- `roll a dice`
+- `dice`
     - rolls a six-sided die
-- `flip a coin`
+- `coin`
     - flips a two-sided coin
 - `meme`:
     - retrieves a random meme

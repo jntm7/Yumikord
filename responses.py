@@ -319,10 +319,10 @@ def get_response(user_input: str) -> str:
     elif 'how are you' in lowered:
         return 'Great, thanks!'
     # roll dice
-    elif 'roll a dice' in lowered:
+    elif 'dice' in lowered:
         return f'You rolled: {roll_dice()}'
     # flip coin
-    elif 'flip a coin' in lowered:
+    elif 'coin' in lowered:
         return f'You got: {flip_coin()}'
     else:
         return choose_random_response(lowered)
