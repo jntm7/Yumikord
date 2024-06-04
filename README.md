@@ -145,11 +145,11 @@ Things to note:
 
 ### Temperature Converter
 
-```convert 15 c f``` convert 15 Celsius to Fahrenheit
-```convert 85 f c``` convert 85 Fahrenheit to Celsius
+- ```convert 15 c f``` convert 15 Celsius to Fahrenheit
+- ```convert 85 f c``` convert 85 Fahrenheit to Celsius
 
 ### Pokémon Information
 
-```pokemon.pikachu``` information for Pikachu
-```pokemon.bulbasaur``` information for bulbasaur
-```pokemon.charizard``` information for charizard
+- ```pokemon.pikachu``` information for Pikachu
+- ```pokemon.bulbasaur``` information for Bulbasaur
+- ```pokemon.charizard``` information for Charizard
