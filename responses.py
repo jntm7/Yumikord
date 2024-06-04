@@ -137,6 +137,71 @@ def convert_units(value: float, from_unit: str, to_unit: str, conversion_factors
     converted_value = value * conversion_factor
     return f"{value} {from_unit} is {converted_value:.2f} {to_unit}" # .2f = 2 decimal places
 
+# Memes API
+def get_meme() -> str:
+    try:
+        response = requests.get("https://meme-api.com/gimme")
+        response.raise_for_status()
+        meme = response.json()
+        return meme["url"]
+    except Exception as e:
+        return f"Couldn't retrieve any memes right now. Please try again later! ({e})"
+
+# Jokes API
+def get_jokeapi_joke() -> str:
+    try:
+        response = requests.get("https://v2.jokeapi.dev/joke/Any")
+        response.raise_for_status()
+        joke = response.json()
+        if joke['type'] == 'single':
+            return joke['joke']
+        else:
+            return f"{joke['setup']}{joke['delivery']}"
+    except Exception as e:
+        return f"Couldn't retrieve any jokes right now. Please try again later! ({e})"
+
+# Quotes API
+def get_quote() -> str:
+    try:
+        response = requests.get("https://zenquotes.io/api/random")
+        response.raise_for_status()
+        quote = response.json()[0]
+        return f"{quote['q']}\n— {quote['a']}"
+    except Exception as e:
+        return f"Couldn't retrieve any quotes right now. Please try again later! ({e})" 
+
+# Facts API
+def get_fact() -> str:
+    try:
+        response = requests.get("https://uselessfacts.jsph.pl/random.json?language=en")
+        response.raise_for_status()
+        fact_data = response.json()
+        fact_text = fact_data.get('text', 'No fact available')
+        return f"{fact_text}"
+    except Exception as e:
+        return f"Couldn't retrieve any facts right now. Please try again later! ({e})"
+
+# Reddit Subreddit Fetcher
+def get_subreddit_posts(subreddit, limit=3):
+    try:
+        response = requests.get("https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&limit={limit}")
+        response.raise_for_status()
+        posts = response.json()['data']
+        if posts:
+            return formatted_posts(posts)
+        else:
+            return "No posts found in the subreddit."
+    except Exception as e:
+        return f"Couldn't retrieve any posts from r/{subreddit} right now. Please try again later! ({e})"
+
+def formatted_posts(posts: list) -> str:
+    formatted = ""
+    for post in posts:
+        formatted += f"Title: {post['title']}\n"
+        formatted += f"Author: {post['author']}\n"
+        formatted += f"URL: {post['url']}\n"
+    return formatted
+
 # Roll a dice
 def roll_dice() -> int:
     return random.randint(1,6)
@@ -151,6 +216,7 @@ def choose_random_response(user_input: str) -> str:
         'I do not quite understand...',
         'What are you talking about?',
         'Do you mind rephrasing that?'
+        'Stop yapping nonsense.'
     ]
     return random.choice(responses) if user_input else 'You did not say anything...'
 
@@ -200,6 +266,22 @@ def get_response(user_input: str) -> str:
             return result
         except ValueError:
             return 'Invalid value for conversion. Please enter a numeric value.'
+    # memes
+    elif 'meme' in lowered:
+        return get_meme()
+    # jokes
+    elif 'joke' in lowered:
+        return get_jokeapi_joke()
+    # quotes
+    elif 'quote' in lowered:
+        return get_quote()
+    # facts
+    elif 'fact' in lowered:
+        return get_fact()
+    # reddit subreddit fetcher
+    elif lowered.startswith('subreddit.'):
+        subreddit = lowered.split('.')[1].strip()
+        return get_subreddit_posts(subreddit)
     # OTHER RESPONSES
     # hello  
     elif 'hello' in lowered:
