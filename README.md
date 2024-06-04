@@ -1,4 +1,4 @@
-# Basic Discord Chat Bot
+# Subaru - a basic chat bot for Discord!
 
 ## Step 1: 
 
