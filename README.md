@@ -112,11 +112,11 @@ Things to note:
     - flips a two-sided coin
 - `meme`:
     - retrieves a random meme
-    - [Thanks to Meme API](https://meme-api.com/)
+    - [Thanks to MemeAPI](https://meme-api.com/)
 
 - `joke`:
     - retrives a random joke
-    - [Thanks to Joke API](https://v2.jokeapi.dev/)
+    - [Thanks to JokeAPI](https://v2.jokeapi.dev/)
 - `quote`:
     - retrieves a random quote
     - [Thanks to ZenQuotes](https://zenquotes.io)
