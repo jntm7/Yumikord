@@ -202,6 +202,24 @@ def formatted_posts(posts: list) -> str:
         formatted += f"URL: {post['url']}\n"
     return formatted
 
+# Pokemon API
+def get_pokemon_info(pokemon_name):
+    try:
+        response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon_name.lower()}")
+        response.raise_for_status()
+        pokemon_data = response.json()
+        if pokemon_data:
+            name = pokemon_data['name'].capitalize()
+            types = ', '.join([t['type']['name'].capitalize() for t in pokemon_data['types']])
+            abilities = ', '.join([a['ability']['name'].capitalize() for a in pokemon_data['abilities']])
+            stats = ', '.join([f"{s['stat']['name'].capitalize()}: {s['base_stat']}" for s in pokemon_data['stats']])
+            sprite_url = pokemon_data['sprites']['front_default']
+            return f"**Name:** {name}\n**Type(s):** {types}\n**Abilities:** {abilities}\n**Base Stats:** {stats}\n**Sprite:** {sprite_url}"
+        else:
+            return f"Please enter a valid Pokémon."
+    except Exception as e:
+        return f"Couldn't retrieve anything from PokéAPI. Please try again later! ({e})"
+
 # Roll a dice
 def roll_dice() -> int:
     return random.randint(1,6)
@@ -222,7 +240,9 @@ def choose_random_response(user_input: str) -> str:
 
 # Responses
 def get_response(user_input: str) -> str:
+    print(f"User input: {user_input}")
     lowered: str = user_input.lower()
+    print(f"Lowered: {lowered}")
     # no message
     if lowered == '':
         return 'Well, this is awkward...'
@@ -281,7 +301,16 @@ def get_response(user_input: str) -> str:
     # reddit subreddit fetcher
     elif lowered.startswith('subreddit.'):
         subreddit = lowered.split('.')[1].strip()
+        if len(subreddit) < 1:
+            return 'Please enter a valid subreddit.'
         return get_subreddit_posts(subreddit)
+    # pokemon information
+    elif lowered.startswith('pokemon.'):
+        segments = lowered.split('.')
+        if len(segments) < 2:
+            return 'Please enter a valid Pokémon.'
+        pokemon_name = segments[1].strip()
+        return get_pokemon_info(pokemon_name)
     # OTHER RESPONSES
     # hello  
     elif 'hello' in lowered:
