@@ -37,7 +37,7 @@ Ensure that you have Python installed. You can download it from the [**Python of
 
 ### Step 5:
 
-Before running the program, users will need to install the required dependencies found in [**requirements.txt**](main/build/requirements.txt)
+Before running the program, users will need to install the required dependencies found in [**requirements.txt**](build/requirements.txt)
 
 To do this:
 - Navigate to the directory you extracted or clone the repository.
@@ -48,15 +48,15 @@ To do this:
 
 Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in [Step 2](#step-2).
 
-Open the [.env file](main/.env) with a text editor (e.g. Notepad) and copy this Discord key after `DISCORD_TOKEN`.
+Open the [.env file](build/.env) with a text editor (e.g. Notepad) and copy this Discord key after `DISCORD_TOKEN`.
 
 Keep this token secure and refrain from sharing it. 
 
-However, you can always reset the token, just remember to replace the `DISCORD_TOKEN` value in the [.env file](main/build/.env).
+However, you can always reset the token, just remember to replace the `DISCORD_TOKEN` value in the [.env file](build/.env).
 
 ### Step 7:
 
-Run [**main.py**](main/build/main.py) in IDE or code editor of your choice (e.g. VSCode) to launch the bot.
+Run [**main.py**](build/main.py) in IDE or code editor of your choice (e.g. VSCode) to launch the bot.
 
 If there are no errors:
 - `"YOURBOTNAME is now running!"` should be shown in the terminal.
