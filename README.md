@@ -107,7 +107,7 @@ Things to note:
 ### Fun
 
 - `dice`
-    - rolls a six-sided die
+    - rolls a six-sided dice
 - `coin`
     - flips a two-sided coin
 - `meme`:
