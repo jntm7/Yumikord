@@ -1,4 +1,5 @@
-# Subaru - an fun and helpful bot for your Discord server!
+# Subaru
+Elevate your Discord community with this versatile and multifunctional bot!
 
 ## Step 1: 
 
