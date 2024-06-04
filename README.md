@@ -37,7 +37,7 @@ Ensure that you have Python installed. You can download it from the [**Python of
 
 ### Step 5:
 
-Before running the program, users will need to install the required dependencies found in [** requirements.txt**](main/build/requirements.txt)
+Before running the program, users will need to install the required dependencies found in [**requirements.txt**](main/build/requirements.txt)
 
 To do this:
 - Navigate to the directory you extracted or clone the repository.
