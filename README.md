@@ -1,4 +1,4 @@
-# Subaru - a basic chat bot for Discord!
+# Subaru - an fun and helpful bot for your Discord server!
 
 ## Step 1: 
 
@@ -71,10 +71,11 @@ Things to note:
 
 ## Current Bot Commands:
 
+### Greetings
 - `hello`
 - `how are you`
-- `roll a dice`
-- `flip a coin`
+
+### Tools
 - `calculate`: 
     - supported operations: 
         - addition
@@ -97,6 +98,12 @@ Things to note:
         - pounds (lbs) + kilograms (kg)
         - ounces (oz) + grams (g)
         - liters (l) + gallons (gal)
+
+### Fun
+- `roll a dice`
+    - rolls a six-sided die
+- `flip a coin`
+    - flips a two-sided coin
 - `meme`:
     - retrieves a random meme
     - [Thanks to Meme API](https://meme-api.com/)
