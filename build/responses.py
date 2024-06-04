@@ -6,11 +6,6 @@ from datetime import datetime
 from fuzzywuzzy import process
 from googletrans import Translator
 from urllib.parse import quote
-import openmeteo_requests
-import requests_cache
-import pandas as pd
-from retry_requests import retry
-translator = Translator()
 
 conversion_factors = {
     'miles_to_km': 1.60934,
@@ -85,51 +80,8 @@ def get_current_time(city):
     except Exception as e:
         return 'An error occurred while fetching the time.'
 
-# World Weather API
-
-cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
-retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
-openmeteo = openmeteo_requests.Client(session=retry_session)
-
-def get_weather(city: str) -> str:
-    try:
-        latitude, longitude = get_lat_lon(city)
-        url = "https://api.open-meteo.com/v1/forecast"
-        params = {
-            "latitude": latitude,
-            "longitude": longitude,
-            "hourly": "temperature_2m"
-        }
-        responses = openmeteo.weather_api(url, params=params)
-        response = responses[0]
-        coordinates = f"{response.Latitude()}°N {response.Longitude()}°E"
-        elevation = f"Elevation {response.Elevation()} m asl"
-        timezone = f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}"
-        utc_offset = f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s"
-        hourly = response.Hourly()
-        hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
-        hourly_data = {
-            "date": pd.date_range(
-                start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
-                end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
-                freq=pd.Timedelta(seconds=hourly.Interval()),
-                inclusive="left"
-            )
-        }
-        hourly_data["temperature_2m"] = hourly_temperature_2m
-        hourly_dataframe = pd.DataFrame(data=hourly_data)
-        weather_info = f"Coordinates: {coordinates}\n{elevation}\n{timezone}\n{utc_offset}\n\nHourly Data:\n{hourly_dataframe}"
-        return weather_info
-    except Exception as e:
-        return f"Couldn't retrieve weather information for {city}. ({e})"
-    
-def get_lat_lon(city: str):
-    city_coordinates = {
-        "hong kong": (22.3193, 114.1694),
-    }
-    return city_coordinates.get(city.lower(), (None, None))
-
 # Google Translate API
+translator = Translator()
 def translate_text(text: str, source_language: str, target_language: str) -> tuple:
     try:
         translated = translator.translate(text, src=source_language, dest=target_language)

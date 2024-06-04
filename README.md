@@ -90,8 +90,6 @@ Things to note:
 - `time in (city)`
     - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
-- `weather in (city)`
-    - [Thanks to Open-Meteo](https://open-meteo.com)
 - `translate (text sourcelanguage targetlanguage)`
     - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
     - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
