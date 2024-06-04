@@ -97,6 +97,22 @@ Things to note:
         - pounds (lbs) + kilograms (kg)
         - ounces (oz) + grams (g)
         - liters (l) + gallons (gal)
+- `meme`:
+    - retrieves a random meme
+    - [Thanks to Meme API](https://meme-api.com/)
+
+- `joke`:
+    - retrives a random joke
+    - [Thanks to Joke API](https://v2.jokeapi.dev/)
+- `quote`:
+    - retrieves a random quote
+    - [Thanks to ZenQuotes](https://zenquotes.io)
+- `fact`:
+    - retrieves a random fact
+    - [Thanks to UselessFacts](https://uselessfacts.jsph.pl)
+- `pokemon.(pokemonname)`:
+    - retrieves information for a Pokémon
+    - [Thanks to PokeAPI](https://pokeapi.co/)
 
 ## Basic Usage Examples
 
@@ -131,3 +147,9 @@ Things to note:
 
 ```convert 15 c f``` convert 15 Celsius to Fahrenheit
 ```convert 85 f c``` convert 85 Fahrenheit to Celsius
+
+### Pokémon Information
+
+```pokemon.pikachu``` information for Pikachu
+```pokemon.bulbasaur``` information for bulbasaur
+```pokemon.charizard``` information for charizard
