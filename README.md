@@ -90,6 +90,8 @@ Things to note:
 - `time in (city)`
     - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
+- `weather in (city)`
+    - [Thanks to Open-Meteo](https://open-meteo.com)
 - `translate (text sourcelanguage targetlanguage)`
     - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
     - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
@@ -103,6 +105,9 @@ Things to note:
         - pounds (lbs) + kilograms (kg)
         - ounces (oz) + grams (g)
         - liters (l) + gallons (gal)
+- `subreddit.(subredditname)`: (CURRENTLY OUT OF SERVICE)
+    - retrieves the latest posts from a specified subreddit
+    - [Thanks to PushShift](https://pushshift.io/)
 
 ### Fun
 
@@ -113,7 +118,6 @@ Things to note:
 - `meme`:
     - retrieves a random meme
     - [Thanks to Meme API](https://meme-api.com/)
-
 - `joke`:
     - retrives a random joke
     - [Thanks to Joke API](https://v2.jokeapi.dev/)
@@ -126,6 +130,16 @@ Things to note:
 - `pokemon.(pokemonname)`:
     - retrieves information for a Pokémon
     - [Thanks to PokeAPI](https://pokeapi.co/)
+- `waifu`:
+    - retrieves a random waifu image
+    - to retrieve a random NSFW waifu image use `waifu.nsfw`
+    - [Thanks to Waifu.im](https://docs.waifu.im)
+- `anime`: (CURRENTLY OUT OF SERVICE)
+    - retrieves a random anime fact
+    - [Thanks to Anime Facts Rest API](https://chandan-02.github.io/anime-facts-rest-api/)
+- `cat`: (CURRENTLY OUT OF SERVICE)
+    - retrieves a random cat image
+    - [Thanks to CATAAS (Cat As A Service)](https://cataas.com)
 
 ## Basic Usage Examples
 

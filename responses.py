@@ -5,6 +5,11 @@ import requests
 from datetime import datetime
 from fuzzywuzzy import process
 from googletrans import Translator
+from urllib.parse import quote
+import openmeteo_requests
+import requests_cache
+import pandas as pd
+from retry_requests import retry
 translator = Translator()
 
 conversion_factors = {
@@ -79,7 +84,51 @@ def get_current_time(city):
         return f'The current time in {city.title()} is: {current_time}'
     except Exception as e:
         return 'An error occurred while fetching the time.'
+
+# World Weather API
+
+cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
+retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+openmeteo = openmeteo_requests.Client(session=retry_session)
+
+def get_weather(city: str) -> str:
+    try:
+        latitude, longitude = get_lat_lon(city)
+        url = "https://api.open-meteo.com/v1/forecast"
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "hourly": "temperature_2m"
+        }
+        responses = openmeteo.weather_api(url, params=params)
+        response = responses[0]
+        coordinates = f"{response.Latitude()}°N {response.Longitude()}°E"
+        elevation = f"Elevation {response.Elevation()} m asl"
+        timezone = f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}"
+        utc_offset = f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s"
+        hourly = response.Hourly()
+        hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
+        hourly_data = {
+            "date": pd.date_range(
+                start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
+                end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
+                freq=pd.Timedelta(seconds=hourly.Interval()),
+                inclusive="left"
+            )
+        }
+        hourly_data["temperature_2m"] = hourly_temperature_2m
+        hourly_dataframe = pd.DataFrame(data=hourly_data)
+        weather_info = f"Coordinates: {coordinates}\n{elevation}\n{timezone}\n{utc_offset}\n\nHourly Data:\n{hourly_dataframe}"
+        return weather_info
+    except Exception as e:
+        return f"Couldn't retrieve weather information for {city}. ({e})"
     
+def get_lat_lon(city: str):
+    city_coordinates = {
+        "hong kong": (22.3193, 114.1694),
+    }
+    return city_coordinates.get(city.lower(), (None, None))
+
 # Google Translate API
 def translate_text(text: str, source_language: str, target_language: str) -> tuple:
     try:
@@ -220,6 +269,68 @@ def get_pokemon_info(pokemon_name):
     except Exception as e:
         return f"Couldn't retrieve anything from PokéAPI. Please try again later! ({e})"
 
+# Waifu Image
+def get_waifu_image(nsfw: bool = False) -> str:
+    sfw_tags = ["waifu", "maid", "selfies", "uniform"]
+    nsfw_tags = ["ero", "ass", "hentai", "milf", "oral", "paizuri", "ecchi", "oppai"]
+    try:
+        if nsfw:
+            tag = random.choice(nsfw_tags)
+            response = requests.get(f"https://api.waifu.im/search?included_tags={tag}")
+        else:
+            tag = random.choice(sfw_tags)
+            response = requests.get(f"https://api.waifu.im/search?included_tags={tag}")
+        response.raise_for_status()
+        waifu_data = response.json()
+        if waifu_data and 'images' in waifu_data and len(waifu_data['images']) > 0:
+            image_url = waifu_data['images'][0]['url']
+            return image_url
+        else:
+            return "Couldn't retrieve any waifu images right now. Please try again later!"
+    except Exception as e:
+        return f"Couldn't retrieve any waifu images right now. Please try again later! ({e})"
+
+# Anime Facts
+def get_anime_fact() -> str:
+    try:
+        anime_list_url = "https://anime-facts-rest-api.herokuapp.com/api/v1"
+        response = requests.get(anime_list_url)
+        response.raise_for_status()
+        anime_list = response.json().get('data', [])
+
+        if anime_list:
+            random_anime = random.choice(anime_list)
+            anime_name = random_anime['anime_name']
+
+            anime_facts_url = f"https://anime-facts-rest-api.herokuapp.com/api/v1/:{anime_name}"
+            response = requests.get(anime_facts_url)
+            response.raise_for_status()
+            anime_facts = response.json().get('data', [])
+
+            if anime_facts:
+                random_fact = random.choice(anime_facts)
+                return random_fact['fact']
+            else:
+                return "Couldn't retrieve any facts for this anime."
+        else:
+            return "Couldn't retrieve this anime."
+    except Exception as e:
+        return f"Couldn't retrieve any anime facts right now. Please try again later! ({e})"
+
+# Cat GIFs
+def get_cat() -> str:
+    try:
+        response = requests.get("https://www.cataas.com/cat?json=true")
+        response.raise_for_status()
+        cat_data = response.json()
+        if cat_data and 'url' in cat_data:
+            gif_url = f"https://cataas.com{cat_data['url']}"
+            return gif_url
+        else:
+            return "Couldn't retrieve any cats right now. Please try again later!"
+    except Exception as e:
+        return f"Couldn't retrieve any cats right now. Please try again later! ({e})"
+
 # Roll a dice
 def roll_dice() -> int:
     return random.randint(1,6)
@@ -240,12 +351,12 @@ def choose_random_response(user_input: str) -> str:
 
 # Responses
 def get_response(user_input: str) -> str:
-    print(f"User input: {user_input}")
     lowered: str = user_input.lower()
-    print(f"Lowered: {lowered}")
+
     # no message
     if lowered == '':
         return 'Well, this is awkward...'
+    
     # calculator
     elif 'calculate' in lowered:
         expression = lowered.replace('calculate', '', 1).strip()
@@ -253,6 +364,7 @@ def get_response(user_input: str) -> str:
             return f'The answer is: {calculator(expression)}'
         else:
             return 'Please enter a valid calculation expression.'
+
     # world timezone clock
     elif 'time in' in lowered:
          city = lowered.replace('time in', '', 1).strip()
@@ -260,6 +372,15 @@ def get_response(user_input: str) -> str:
             return get_current_time(city)
          else:
              return 'Please enter a valid city name.'
+         
+    # world weather information
+    elif 'weather in' in lowered:
+        city = lowered.replace('weather in', '', 1).strip()
+        if city:
+            return get_weather(city)
+        else:
+            return 'Please enter a valid city name.'
+
     # translate
     elif lowered.startswith('translate'):
         segments = lowered.split(' ', 4)
@@ -273,6 +394,7 @@ def get_response(user_input: str) -> str:
             return f"Translated Text:\n{translated_text}\n\nPronunciation:\n{pronunciation}"
         else:
             return f"Translated Text:\n{translated_text}"
+
     # unit converter
     elif lowered.startswith('convert'):
         segments = lowered.split(' ')
@@ -286,24 +408,30 @@ def get_response(user_input: str) -> str:
             return result
         except ValueError:
             return 'Invalid value for conversion. Please enter a numeric value.'
+    
     # memes
     elif 'meme' in lowered:
         return get_meme()
+    
     # jokes
     elif 'joke' in lowered:
         return get_jokeapi_joke()
+    
     # quotes
     elif 'quote' in lowered:
         return get_quote()
+    
     # facts
     elif 'fact' in lowered:
         return get_fact()
+    
     # reddit subreddit fetcher
     elif lowered.startswith('subreddit.'):
         subreddit = lowered.split('.')[1].strip()
         if len(subreddit) < 1:
             return 'Please enter a valid subreddit.'
         return get_subreddit_posts(subreddit)
+    
     # pokemon information
     elif lowered.startswith('pokemon.'):
         segments = lowered.split('.')
@@ -311,18 +439,37 @@ def get_response(user_input: str) -> str:
             return 'Please enter a valid Pokémon.'
         pokemon_name = segments[1].strip()
         return get_pokemon_info(pokemon_name)
+    
+    # waifu image
+    elif lowered == 'waifu':
+        return get_waifu_image()
+    elif lowered == 'waifu.nsfw':
+        return get_waifu_image(nsfw=True)
+    
+    # anime facts
+    elif 'anime' in lowered:
+        return get_anime_fact()
+    
+    # cat gifs
+    elif 'cat' in lowered:
+        return get_cat()
+    
     # OTHER RESPONSES
     # hello  
     elif 'hello' in lowered:
         return 'Hello there!'
+    
     # how are you
     elif 'how are you' in lowered:
         return 'Great, thanks!'
+    
     # roll dice
     elif 'dice' in lowered:
         return f'You rolled: {roll_dice()}'
+    
     # flip coin
     elif 'coin' in lowered:
         return f'You got: {flip_coin()}'
+    
     else:
         return choose_random_response(lowered)
