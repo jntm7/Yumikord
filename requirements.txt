@@ -1,4 +1,4 @@
-requests==2.25.1
+requests==2.32.2
 fuzzywuzzy==0.18.0
 googletrans==4.0.0-rcl
 discord==2.3.2
