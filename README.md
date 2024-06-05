@@ -160,31 +160,31 @@ Things to note:
 
 ### World Weather
 
-```weather in Vancouver```
-```weather in Seoul```
-```weather in New Delhi```
-```weather in Madrid```
+-```weather in Vancouver```
+-```weather in Seoul```
+-```weather in New Delhi```
+-```weather in Madrid```
 
 ### Translator
 
-- ```translate apple en fr``` translate apple in English to French
-- ```translate ありがとう jp es``` translate thank you in Japanese to Spanish
-- ```translate krapfen de zh-CN``` translate donut in German to Chinese
+- ```translate apple en fr```             to translate apple in English to French
+- ```translate ありがとう jp es```         to translate thank you in Japanese to Spanish
+- ```translate krapfen de zh-CN```        to translate donut in German to Chinese
 
 ### Unit Converter
 
-- ```convert 10 mi km``` convert 10 miles to kilometres
-- ```convert 6 ft m```   convert 6 feet to metres
-- ```convert 12 in cm``` convert 12 inches to centimetres
-- ```convert 45 lb kg``` convert 45 pounds to kilograms
+- ```convert 10 mi km```         to convert 10 miles to kilometres
+- ```convert 6 ft m```           to convert 6 feet to metres
+- ```convert 12 in cm```         to convert 12 inches to centimetres
+- ```convert 45 lb kg```         to convert 45 pounds to kilograms
 
 ### Temperature Converter
 
-- ```convert 15 c f``` convert 15 Celsius to Fahrenheit
-- ```convert 85 f c``` convert 85 Fahrenheit to Celsius
+- ```convert 15 c f```         to convert 15 Celsius to Fahrenheit
+- ```convert 85 f c```         to convert 85 Fahrenheit to Celsius
 
 ### Pokémon Information
 
-- ```pokemon.pikachu``` information for Pikachu
-- ```pokemon.bulbasaur``` information for Bulbasaur
-- ```pokemon.charizard``` information for Charizard
+- ```pokemon.pikachu```        for information on Pikachu
+- ```pokemon.bulbasaur```      for information on Bulbasaur
+- ```pokemon.charizard```      for information on Charizard
