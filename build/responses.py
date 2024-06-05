@@ -178,7 +178,7 @@ def get_meme() -> str:
         return f"Couldn't retrieve any memes right now. Please try again later! ({e})"
 
 # Jokes API
-def get_jokeapi_joke() -> str:
+def get_joke() -> str:
     try:
         response = requests.get("https://v2.jokeapi.dev/joke/Any")
         response.raise_for_status()
@@ -186,7 +186,7 @@ def get_jokeapi_joke() -> str:
         if joke['type'] == 'single':
             return joke['joke']
         else:
-            return f"{joke['setup']}{joke['delivery']}"
+            return f"{joke['setup']}\n{joke['delivery']}"
     except Exception as e:
         return f"Couldn't retrieve any jokes right now. Please try again later! ({e})"
 
@@ -196,7 +196,7 @@ def get_quote() -> str:
         response = requests.get("https://zenquotes.io/api/random")
         response.raise_for_status()
         quote = response.json()[0]
-        return f"{quote['q']}\n— {quote['a']}"
+        return f'"{quote["q"]}"\n— {quote["a"]}'
     except Exception as e:
         return f"Couldn't retrieve any quotes right now. Please try again later! ({e})" 
 
@@ -331,12 +331,16 @@ def random_number(command: str) -> str:
         return 'Please provide valid nubmers for the range.'
 
 # Rock Paper Scissors
-def play_rps(command: str) -> str:
-    user_choice = command.split()[-1].lower()
+active_rps = {}
+
+def play_rps(user_id, user_choice):
     choices = ['rock', 'paper', 'scissors']
+    bot_choice = random.choice(choices)
+    active_rps.pop(user_id, None)
+
     if user_choice not in choices:
         return "Please choose one of: rock, paper or scissors."
-    bot_choice = random.choice(choices)
+    
     if user_choice == bot_choice:
         return f"Both chose {user_choice}. It's a draw!"
     elif (user_choice == 'rock' and bot_choice == 'scissors') or \
@@ -347,27 +351,46 @@ def play_rps(command: str) -> str:
         return f"You chose {user_choice} and I chose {bot_choice}. You lose! Better luck next time!"
 
 # Number Guesser
-def play_guesser():
-    number_to_guess = random.randint(1,100)
-    attempts = 0
-    max_attempts = 5
+game_states = {}
 
-    response = f"I've chosen a number between 1 and 100. Can you guess it? I'll give you {max_attempts} chances. Let's start!\n"
-    while attempts < max_attempts:
-        attempts += 1
-        guess = input("Your guess: ")
-        try:
-            guess = int(guess)
-            if guess < number_to_guess:
-                response += f"Too low! Guess higher. You have {max_attempts - attempts} left.\n"
-            elif guess > number_to_guess:
-                response += f"Too high! Guess lower. You have {max_attempts - attempts} left.\n"
-            else:
-                response += f"Congratulations! You guessed the number {number_to_guess} in {attempts} attempts. Impressive!\n"
-                return response
-        except ValueError:
-            response += "Please enter a valid number.\n"
-    response += f"Unfortunately, you've run out of attempts. The number I chose was {number_to_guess}. Better luck next time!\n"
+def start_guesser(user_id):
+    secret_number = random.randint(1,100)
+    attempts = 0
+    max_attempts = 7
+    game_states[user_id] = {'number': secret_number, 'attempts': attempts}
+    return f"I've chosen a number between 1 and 100. Can you guess it? I'll give you {max_attempts} chances. Let's start!\n"
+
+def play_guesser(user_id, guess):
+    if user_id not in game_states:
+        return "To start a game, please enter 'play.guess'."
+    
+    game_state = game_states[user_id]
+    secret_number = game_state['number']
+    attempts = game_state['attempts'] + 1
+    max_attempts = 7
+    response = ""
+
+    try:
+        guess = int(guess)
+        if guess < secret_number:
+            response += f"Too low! Guess higher. You have {max_attempts - attempts} attempts left.\n"
+        elif guess > secret_number:
+            response += f"Too high! Guess lower. You have {max_attempts - attempts} attempts left.\n"
+        else:
+            response += f"Congratulations! You guessed the number {secret_number} in {attempts} attempts, very impressive!\n"
+            del game_states[user_id]
+            return response
+    except ValueError:
+        response += "Please enter a valid number.\n"
+        return response
+
+    if  attempts >= max_attempts:
+        response += f"Unfortunately, you've run out of attempts. The number I chose was {secret_number}. Better luck next time!\n"
+        del game_states[user_id]
+    else:
+        game_state['attempts'] = attempts
+        game_states[user_id] = game_state
+
     return response
 
 # Response to an unsupported message
@@ -375,13 +398,14 @@ def choose_random_response(user_input: str) -> str:
     responses: Final[str] = [
         'I do not quite understand...',
         'What are you talking about?',
-        'Do you mind rephrasing that?'
-        'Stop yapping nonsense.'
+        'Do you mind rephrasing that?',
+        'Stop yapping nonsense.',
+        'Type "help" to learn more about what I can do.'
     ]
     return random.choice(responses) if user_input else 'You did not say anything...'
 
 # Responses
-def get_response(user_input: str) -> str:
+def get_response(user_input: str, user_id: str = None) -> str:
     lowered: str = user_input.lower()
 
     # no message
@@ -399,11 +423,19 @@ def get_response(user_input: str) -> str:
             `weather in <city>` - Displays the current weather in the specified city.
             `translate <text> <source_language> <target_language>` - Translates text from one language to another.
             
+            `?play <link>` - start audio playback from a specified link
+            `?pause` - pause audio playback
+            `?resume` - resume audio playback
+            `?stop` - stop audio playback
+            `?loop` - loop audio playback
+            `?endloop` - stop looping audio playback
+
             `dice` - Rolls a 6-sided dice.
             `coin` - Flips a 2-sided coin.
             `number <min> <max>` - Generates a random number between a specified range.
             `play.rps` - Play a game of rock-paper-scissors.
             `play.guess` - Play a game of number guessing.
+            `guess.<number>` - Input after starting the number guessing game.
 
             `joke` - Tells you a random joke.
             `fact` - Tells you a random fact.
@@ -477,7 +509,7 @@ def get_response(user_input: str) -> str:
     
     # jokes
     elif 'joke' in lowered:
-        return get_jokeapi_joke()
+        return get_joke()
     
     # quotes
     elif 'quote' in lowered:
@@ -539,10 +571,19 @@ def get_response(user_input: str) -> str:
     
     # rock paper scissors
     elif lowered == 'play.rps':
-        return play_rps(lowered)
+        active_rps[user_id] = True
+        return "Let's play Rock-Paper-Scissors! Type 'rock', 'paper', or 'scissors' to make your choice."
     
+    elif user_id in active_rps and lowered in ['rock', 'paper', 'scissors']:
+        return play_rps(user_id, lowered)
+    
+    # number guesser
     elif lowered == 'play.guess':
-        return play_guesser(lowered)
+        return start_guesser(user_id)
+    
+    elif lowered.startswith('guess.'):
+        guess = lowered.split('guess.', 1)[1].strip()
+        return play_guesser(user_id, guess)
 
     else:
         return choose_random_response(lowered)
