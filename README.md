@@ -1,5 +1,8 @@
 # Yumikord
-Elevate your Discord community with Yumiko - a versatile and multifunctional bot!
+
+![image](https://github.com/jntm7/Yumikord/assets/108718802/349a4bbf-e7fd-443b-9c65-b07761743934)
+
+*Elevate your Discord community with **Yumiko** - a versatile and multifunctional bot!*
 
 ## Installation & Setup
 
@@ -31,7 +34,7 @@ Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 
 ### Step 4:
 
-**Clone this repository** with your preferred version control platform (e.g. GitHub Desktop), or simply **download the code as a ZIP file** and extract it to your preferred directory.
+**Clone this repository** with your preferred version control platform (e.g. GitHub Desktop), or simply **download [build](build)** and place it to your preferred directory.
 
 Ensure that you have Python installed. You can download it from the [**Python official website**](https://www.python.org/downloads/). During installation, check the option to `add Python to system PATH`.
 
