@@ -27,7 +27,7 @@ Obtain your **Discord token** by:
 Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 - Navigate to `Discord Developer Portal > Settings > OAuth2`.
 - Under `OAuth2 URL Generator`, assign the `bot` scope.
-- Under `Bot Permissions`, assign the bot **all the text permissions**, plus others of your choice.
+- Under `Bot Permissions`, assign the bot **all the text permissions**, as well as **connect, speak under voice permissions**.
 
 ### Step 4:
 
@@ -83,19 +83,10 @@ Things to note:
 
 - `calculate`: 
     - supported operations: 
-        - addition
-        - subtraction
-        - multiplication
-        - division
-- `time in <city>`
-    - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
-    - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
-- `weather in <city>`
-    - [Thanks to wttr.in](https://wttr.in)
-    - [complete list of supported cities](https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json)
-- `translate <text> <sourcelanguage> <targetlanguage>`
-    - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
-    - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
+        - addition (`+`)
+        - subtraction (`-`)
+        - multiplication (`*`)
+        - division (`/`)
 - `convert`: 
     - supported unit pairs (with their associated abbreviations):
         - fahrenheit(F) + celsius (C)
@@ -106,9 +97,30 @@ Things to note:
         - pounds (lbs) + kilograms (kg)
         - ounces (oz) + grams (g)
         - liters (l) + gallons (gal)
+- `time in <city>`
+    - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
+    - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
+- `weather in <city>`
+    - [Thanks to wttr.in](https://wttr.in)
+    - [complete list of supported cities](https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json)
+- `translate <text> <sourcelanguage> <targetlanguage>`
+    - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
+    - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
 - `subreddit.<subredditname>`: (CURRENTLY OUT OF SERVICE)
     - retrieves the latest posts from a specified subreddit
     - [Thanks to PushShift](https://pushshift.io/)
+
+### Music
+
+Currently supports links that have audio (e.g. YouTube, Soundcloud).
+Functions thanks to FFmpeg and [YT-DLP](https://github.com/yt-dlp)
+
+- `?play <link>` - start audio playback
+- `?pause` - pause audio playback
+- `?resume` - resume audio playback
+- `?stop` - stop audio playback
+- `?loop` - loop audio playback
+- `?endloop` - stop looping audio playback
 
 ### Game
 
@@ -117,11 +129,13 @@ Things to note:
 - `coin`
     - flips a 2-sided coin
 - `number <min> <max>`
-    - generates a random number within the specified range.
+    - generates a random number within the specified range
 - `play.rps`
-    - play a game of rock-paper-scissors.
+    - play a game of rock-paper-scissors
+    - input your choice of `<rock>` , `<paper>`, or `<scissors>`
 - `play.guess`
-    - play a game of number guessing.
+    - play a game of number guessing
+    - input your guess using `guess.<number>`
 
 ### Fun
 
@@ -142,7 +156,7 @@ Things to note:
     - [Thanks to PokeAPI](https://pokeapi.co/)
 - `waifu`:
     - retrieves a random SFW waifu image
-    - `waifu.nsfw` retrieves a random NSFW waifu image
+    - retrieve a random NSFW waifu image with `waifu.nsfw`
     - [Thanks to Waifu.im](https://docs.waifu.im)
 - `anime`: (CURRENTLY OUT OF SERVICE)
     - retrieves a random anime fact
@@ -150,6 +164,7 @@ Things to note:
 - `cat`: (CURRENTLY OUT OF SERVICE)
     - retrieves a random cat image
     - [Thanks to CATAAS (Cat As A Service)](https://cataas.com)
+
 
 ## Basic Usage Examples
 
@@ -159,6 +174,18 @@ Things to note:
 - ```calculate 7 - 4```
 - ```calculate 3 x 5 ```
 - ```calculate 10 / 2```
+
+### Unit Converter
+
+- ```convert 10 mi km```         to convert 10 miles to kilometres
+- ```convert 6 ft m```           to convert 6 feet to metres
+- ```convert 12 in cm```         to convert 12 inches to centimetres
+- ```convert 45 lb kg```         to convert 45 pounds to kilograms
+
+### Temperature Converter
+
+- ```convert 15 c f```         to convert 15 Celsius to Fahrenheit
+- ```convert 85 f c```         to convert 85 Fahrenheit to Celsius
 
 ### World Clock
 
@@ -180,17 +207,14 @@ Things to note:
 - ```translate ありがとう jp es```         to translate thank you in Japanese to Spanish
 - ```translate krapfen de zh-CN```        to translate donut in German to Chinese
 
-### Unit Converter
+### Audio Playback
 
-- ```convert 10 mi km```         to convert 10 miles to kilometres
-- ```convert 6 ft m```           to convert 6 feet to metres
-- ```convert 12 in cm```         to convert 12 inches to centimetres
-- ```convert 45 lb kg```         to convert 45 pounds to kilograms
-
-### Temperature Converter
-
-- ```convert 15 c f```         to convert 15 Celsius to Fahrenheit
-- ```convert 85 f c```         to convert 85 Fahrenheit to Celsius
+- ```?play https://youtu.be/dQw4w9WgXcQ```          to start audio playback
+- ```?pause```                                      to pause audio playback
+- ```?resume```                                     to resume audio playback
+- ```?stop```                                       to terminate audio playback (bot will automatically disconnect from the voice channel).
+- ```?loop```                                       to start looping audio playback (TEMPORARILY DISABLED)
+- ```?endloop```                                    to stop looping audio playback (TEMPORARILY DISABLED)
 
 ### Pokémon Information
 
