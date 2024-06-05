@@ -90,6 +90,9 @@ Things to note:
 - `time in (city)`
     - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
+- `weather in (city)`
+    - [Thanks to wttr.in](https://wttr.in)
+    - [complete list of supported cities](https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json)
 - `translate (text sourcelanguage targetlanguage)`
     - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
     - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
@@ -116,7 +119,6 @@ Things to note:
 - `meme`:
     - retrieves a random meme
     - [Thanks to MemeAPI](https://meme-api.com/)
-
 - `joke`:
     - retrives a random joke
     - [Thanks to JokeAPI](https://v2.jokeapi.dev/)
@@ -155,6 +157,13 @@ Things to note:
 - ```time in London```
 - ```time in Shanghai```
 - ```time in New York```
+
+### World Weather
+
+```weather in Vancouver```
+```weather in Seoul```
+```weather in New Delhi```
+```weather in Madrid```
 
 ### Translator
 

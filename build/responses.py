@@ -64,21 +64,42 @@ def validate_expression(expression: str) -> bool:
 # World Time API
 def get_current_time(city):
     try:
-        timezones_response = requests.get(f'https://worldtimeapi.org/api/timezone')
+        timezones_response = requests.get('https://worldtimeapi.org/api/timezone')
+        response.raise_for_status()
         timezones = timezones_response.json()
 
-        # FuzzyWuzzy allows users to input 'new york' instead of 'New_York'
         best_match, match_score = process.extractOne(city, timezones, scorer = process.fuzz.partial_ratio)
         if match_score < 80:
             return 'Please enter a valid city name.'
         
         response = requests.get(f'https://worldtimeapi.org/api/timezone/{best_match}')
+        response.raise_for_status()
         data = response.json()
         datetime_object = datetime.fromisoformat(data['datetime'])
         current_time = datetime_object.strftime('%I:%M %p')
-        return f'The current time in {city.title()} is: {current_time}'
+        return f'The current time in {best_match.replace("_", " ").title()} is: {current_time}'
     except Exception as e:
-        return 'An error occurred while fetching the time.'
+        return f"Couldn't retrieve the time for {city}. Please try again later! ({e})"
+
+# World Weather API
+def get_weather(city: str) -> str:
+    try:
+        cities_response = requests.get('https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json')
+        response.raise_for_status()
+        cities = cities_response.json()
+        city_names = [c['name'] for c in cities]
+
+        best_match, match_score = process.extractOne(city, city_names, scorer=process.fuzz.partial_ratio)
+        if match_score < 80:
+            return 'Please enter a valid city name.'
+        
+        city_encoded = best_match.replace(' ', '+')
+        response = requests.get(f'https://wttr.in/{city_encoded}?format=%C+%t')
+        response.raise_for_status()
+        weather_data = response.text.strip()
+        return f"The weather in {best_match.title()} is: {weather_data}"
+    except Exception as e:
+        return f"Couldn't retrieve the weather for {city}. Please try again later! ({e})"
 
 # Google Translate API
 translator = Translator()
