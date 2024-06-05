@@ -65,16 +65,16 @@ def validate_expression(expression: str) -> bool:
 def get_current_time(city):
     try:
         timezones_response = requests.get('https://worldtimeapi.org/api/timezone')
-        response.raise_for_status()
+        timezones_response.raise_for_status()
         timezones = timezones_response.json()
 
         best_match, match_score = process.extractOne(city, timezones, scorer = process.fuzz.partial_ratio)
         if match_score < 80:
             return 'Please enter a valid city name.'
         
-        response = requests.get(f'https://worldtimeapi.org/api/timezone/{best_match}')
-        response.raise_for_status()
-        data = response.json()
+        time_response = requests.get(f'https://worldtimeapi.org/api/timezone/{best_match}')
+        time_response.raise_for_status()
+        data = time_response.json()
         datetime_object = datetime.fromisoformat(data['datetime'])
         current_time = datetime_object.strftime('%I:%M %p')
         return f'The current time in {best_match.replace("_", " ").title()} is: {current_time}'
@@ -85,18 +85,26 @@ def get_current_time(city):
 def get_weather(city: str) -> str:
     try:
         cities_response = requests.get('https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json')
-        response.raise_for_status()
+        cities_response.raise_for_status()
         cities = cities_response.json()
         city_names = [c['name'] for c in cities]
 
-        best_match, match_score = process.extractOne(city, city_names, scorer=process.fuzz.partial_ratio)
-        if match_score < 80:
-            return 'Please enter a valid city name.'
+        exact_matches = [name for name in city_names if name.lower() == city.lower()]
+        if exact_matches:
+            best_match = exact_matches[0]
+        else:
+            startswith_matches = [name for name in city_names if name.lower().startswith(city.lower())]
+            if startswith_matches:
+                best_match = startswith_matches[0]
+            else:
+                best_match, match_score = process.extractOne(city, city_names, scorer=process.fuzz.partial_ratio)
+                if match_score < 80:
+                    return 'Please enter a valid city name.'
         
         city_encoded = best_match.replace(' ', '+')
-        response = requests.get(f'https://wttr.in/{city_encoded}?format=%C+%t')
-        response.raise_for_status()
-        weather_data = response.text.strip()
+        weather_response = requests.get(f'https://wttr.in/{city_encoded}?format=%C+%t')
+        weather_response.raise_for_status()
+        weather_data = weather_response.text.strip()
         return f"The weather in {best_match.title()} is: {weather_data}"
     except Exception as e:
         return f"Couldn't retrieve the weather for {city}. Please try again later! ({e})"
@@ -312,6 +320,56 @@ def roll_dice() -> int:
 def flip_coin() -> str:
     return random.choice(['heads', 'tails'])
 
+# Random Number Generator
+def random_number(command: str) -> str:
+    try:
+        _, min_val, max_val = command.split()
+        min_val = int(min_val)
+        max_val = int(max_val)
+        return f'Your random number is {random.randint(min_val, max_val)}'
+    except ValueError:
+        return 'Please provide valid nubmers for the range.'
+
+# Rock Paper Scissors
+def play_rps(command: str) -> str:
+    user_choice = command.split()[-1].lower()
+    choices = ['rock', 'paper', 'scissors']
+    if user_choice not in choices:
+        return "Please choose one of: rock, paper or scissors."
+    bot_choice = random.choice(choices)
+    if user_choice == bot_choice:
+        return f"Both chose {user_choice}. It's a draw!"
+    elif (user_choice == 'rock' and bot_choice == 'scissors') or \
+         (user_choice == 'paper' and bot_choice == 'rock') or \
+         (user_choice == 'scissors' and bot_choice == 'paper'):
+        return f"You chose {user_choice} and I chose {bot_choice}. You win! Congratulations!"
+    else:
+        return f"You chose {user_choice} and I chose {bot_choice}. You lose! Better luck next time!"
+
+# Number Guesser
+def play_guesser():
+    number_to_guess = random.randint(1,100)
+    attempts = 0
+    max_attempts = 5
+
+    response = f"I've chosen a number between 1 and 100. Can you guess it? I'll give you {max_attempts} chances. Let's start!\n"
+    while attempts < max_attempts:
+        attempts += 1
+        guess = input("Your guess: ")
+        try:
+            guess = int(guess)
+            if guess < number_to_guess:
+                response += f"Too low! Guess higher. You have {max_attempts - attempts} left.\n"
+            elif guess > number_to_guess:
+                response += f"Too high! Guess lower. You have {max_attempts - attempts} left.\n"
+            else:
+                response += f"Congratulations! You guessed the number {number_to_guess} in {attempts} attempts. Impressive!\n"
+                return response
+        except ValueError:
+            response += "Please enter a valid number.\n"
+    response += f"Unfortunately, you've run out of attempts. The number I chose was {number_to_guess}. Better luck next time!\n"
+    return response
+
 # Response to an unsupported message
 def choose_random_response(user_input: str) -> str:
     responses: Final[str] = [
@@ -330,6 +388,37 @@ def get_response(user_input: str) -> str:
     if lowered == '':
         return 'Well, this is awkward...'
     
+    # help
+    elif lowered == 'help':
+            help_text = """
+            **Here are my supported commands:**
+
+            `calculate <expression>` - Calculates the given mathematical expression.
+            `convert <value> <from_unit> <to_unit>` - Converts a value from one unit to another.
+            `time in <city>` - Displays the current time in the specified city.
+            `weather in <city>` - Displays the current weather in the specified city.
+            `translate <text> <source_language> <target_language>` - Translates text from one language to another.
+            
+            `dice` - Rolls a 6-sided dice.
+            `coin` - Flips a 2-sided coin.
+            `number <min> <max>` - Generates a random number between a specified range.
+            `play.rps` - Play a game of rock-paper-scissors.
+            `play.guess` - Play a game of number guessing.
+
+            `joke` - Tells you a random joke.
+            `fact` - Tells you a random fact.
+            `meme` - Fetches a random meme.
+            `quote` - Fetches a random quote.
+            `cat` - Fetches a random cat image.
+            
+            `waifu` - Fetches a random SFW waifu image.
+            `waifu.nsfw` - Fetches a random NSFW waifu image.
+            `animefact` - Provides a random anime fact.
+            `pokemon.<pokemon_name>` - Provides information about the specified Pokémon.
+            `subreddit.<subreddit_name>` - Fetches posts from the specified subreddit.
+            """
+            return help_text
+
     # calculator
     elif 'calculate' in lowered:
         expression = lowered.replace('calculate', '', 1).strip()
@@ -444,5 +533,16 @@ def get_response(user_input: str) -> str:
     elif 'coin' in lowered:
         return f'You got: {flip_coin()}'
     
+    # random number
+    elif 'number' in lowered:
+        return f'You got: {random_number()}'
+    
+    # rock paper scissors
+    elif lowered == 'play.rps':
+        return play_rps(lowered)
+    
+    elif lowered == 'play.guess':
+        return play_guesser(lowered)
+
     else:
         return choose_random_response(lowered)

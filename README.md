@@ -87,13 +87,13 @@ Things to note:
         - subtraction
         - multiplication
         - division
-- `time in (city)`
+- `time in <city>`
     - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
-- `weather in (city)`
+- `weather in <city>`
     - [Thanks to wttr.in](https://wttr.in)
     - [complete list of supported cities](https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json)
-- `translate (text sourcelanguage targetlanguage)`
+- `translate <text> <sourcelanguage> <targetlanguage>`
     - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
     - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
 - `convert`: 
@@ -106,16 +106,25 @@ Things to note:
         - pounds (lbs) + kilograms (kg)
         - ounces (oz) + grams (g)
         - liters (l) + gallons (gal)
-- `subreddit.(subredditname)`: (CURRENTLY OUT OF SERVICE)
+- `subreddit.<subredditname>`: (CURRENTLY OUT OF SERVICE)
     - retrieves the latest posts from a specified subreddit
     - [Thanks to PushShift](https://pushshift.io/)
 
-### Fun
+### Game
 
 - `dice`
-    - rolls a six-sided dice
+    - rolls a 6-sided dice
 - `coin`
-    - flips a two-sided coin
+    - flips a 2-sided coin
+- `number <min> <max>`
+    - generates a random number within the specified range.
+- `play.rps`
+    - play a game of rock-paper-scissors.
+- `play.guess`
+    - play a game of number guessing.
+
+### Fun
+
 - `meme`:
     - retrieves a random meme
     - [Thanks to MemeAPI](https://meme-api.com/)
@@ -128,12 +137,12 @@ Things to note:
 - `fact`:
     - retrieves a random fact
     - [Thanks to UselessFacts](https://uselessfacts.jsph.pl)
-- `pokemon.(pokemonname)`:
+- `pokemon.<pokemonname>`:
     - retrieves information for a Pokémon
     - [Thanks to PokeAPI](https://pokeapi.co/)
 - `waifu`:
-    - retrieves a random waifu image
-    - to retrieve a random NSFW waifu image use `waifu.nsfw`
+    - retrieves a random SFW waifu image
+    - `waifu.nsfw` retrieves a random NSFW waifu image
     - [Thanks to Waifu.im](https://docs.waifu.im)
 - `anime`: (CURRENTLY OUT OF SERVICE)
     - retrieves a random anime fact
@@ -160,10 +169,10 @@ Things to note:
 
 ### World Weather
 
--```weather in Vancouver```
--```weather in Seoul```
--```weather in New Delhi```
--```weather in Madrid```
+- ```weather in Vancouver```
+- ```weather in Seoul```
+- ```weather in New Delhi```
+- ```weather in Madrid```
 
 ### Translator
 
