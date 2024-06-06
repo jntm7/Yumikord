@@ -2,6 +2,8 @@ import os
 import asyncio
 import yt_dlp
 import discord
+import signal
+import sys
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message
@@ -13,6 +15,7 @@ print(TOKEN)
 
 intents: Intents = Intents.default()
 intents.message_content = True
+intents.messages = True
 client: Client = Client(intents=intents)
 
 queues = {}
@@ -59,15 +62,35 @@ class AudioPlayer:
 
         try:
             loop = asyncio.get_event_loop()
-            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(link, download=False))
-            song = data['url']
-            player = discord.FFmpegPCMAudio(song, **ffmpeg_options)
-            voice_client.play(player)
+            data = await asyncio.gather(loop.run_in_executor(None, lambda: ytdl.extract_info(link, download=False)))
+            song = data[0]['url']
+            player_task = loop.create_task(self.play_audio_task(voice_client, song))
+            await player_task
+        except KeyError:
+            return "Unable to find audio URL."
+        except discord.ClientException as e:
+            return f"Discord client exception: {e}"
+        except discord.DiscordException as e:
+            return f"Discord exception: {e}"
         except Exception as e:
             print(e)
             return f"Error playing audio: {e}"
 
         return "Audio playback started."
+    
+    async def play_audio_task(self, voice_client, song):
+        try:
+            player = discord.FFmpegPCMAudio(song, **ffmpeg_options)
+            voice_client.play(player)
+        except Exception as e:
+            print(e)
+            raise RuntimeError(f"Error playing audio: {e}")
+
+    async def stop_audio(self, guild_id):
+        if guild_id in self.voice_clients:
+            voice_client = self.voice_clients[guild_id]
+            await voice_client.disconnect()
+            del self.voice_clients[guild_id]
 
 audio_player = AudioPlayer()
 
@@ -86,19 +109,23 @@ async def on_message(message: Message) -> None:
     # Audio Commands
     if user_message.startswith('?play'):
         if message.author.voice and message.author.voice.channel:
-            link_to_play = user_message.split()[1]
-            guild_id = message.guild.id
-            await audio_player.play_audio(link_to_play, guild_id)
+            split_message = user_message.split()
+            if len(split_message) > 1:
+                link_to_play = split_message[1]
+                guild_id = message.guild.id
+                await audio_player.play_audio(link_to_play, guild_id)
+            else:
+                await message.channel.send("Please provide a valid URL to play.")
         else:
             await message.channel.send("Please join a voice channel to use this command.")
 
-    # elif user_message.startswith('?loop'):
-    #     link_to_play = user_message.split()[1]
-    #     guild_id = message.guild.id
-    #     await audio_player.start_loop(link_to_play, guild_id)
+    elif user_message.startswith('?loop'):
+        link_to_play = user_message.split()[1]
+        guild_id = message.guild.id
+        await audio_player.start_loop(link_to_play, guild_id)
 
-    # elif user_message.startswith('?endloop'):
-    #     await audio_player.stop_loop()
+    elif user_message.startswith('?endloop'):
+        await audio_player.stop_loop()
 
     elif user_message.startswith('?pause'):
         if message.author.voice and message.author.voice.channel:
@@ -118,6 +145,10 @@ async def on_message(message: Message) -> None:
         else:
             await message.channel.send("Please join a voice channel to use this command.")
 
+    else:
+        response = get_response(user_message, str(message.author.id))
+        await message.channel.send(response)
+
 ## No Message
 async def send_message(message: Message, user_message: str) -> None:
     if not user_message:
@@ -131,7 +162,16 @@ async def send_message(message: Message, user_message: str) -> None:
     except Exception as e:
         print(e)
 
+def signal_handler(sig, frame):
+    print("Shutting down...")
+    for guild_id, voice_client in audio_player.voice_clients.items():
+        asyncio.run_coroutine_threadsafe(voice_client.disconnect(), client.loop).result()
+    client.close()
+    sys.exit(0)
+
 def main() -> None:
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     client.run(token=TOKEN)
 
 if __name__ == '__main__':

@@ -115,10 +115,13 @@ Things to note:
 - `subreddit.<subredditname>`: (CURRENTLY OUT OF SERVICE)
     - retrieves the latest posts from a specified subreddit
     - [Thanks to PushShift](https://pushshift.io/)
+- `color`
+    - generates a random color palette
+    - [Thanks to Colormind](http://colormind.io/api/)
 
 ### 🎧 Music
 
-Currently supports links that have audio (e.g. YouTube, Soundcloud).
+Extracts and plays audio from a link in a Discord voice channel.
 
 Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dlp).
 
