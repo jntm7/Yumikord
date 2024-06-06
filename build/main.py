@@ -62,7 +62,6 @@ class AudioPlayer:
 
         try:
             loop = asyncio.get_event_loop()
-
             data = await asyncio.gather(loop.run_in_executor(None, lambda: ytdl.extract_info(link, download=False)))
             song = data[0]['url']
             player_task = loop.create_task(self.play_audio_task(voice_client, song))
