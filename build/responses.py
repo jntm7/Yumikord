@@ -461,6 +461,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             `time in <city>` - Displays the current time in the specified city.
             `weather in <city>` - Displays the current weather in the specified city.
             `translate <text> <source_language> <target_language>` - Translates text from one language to another.
+            `dictionary.<word>` - Defines a word.
             
             `?play <link>` - start audio playback from a specified link
             `?pause` - pause audio playback
