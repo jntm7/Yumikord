@@ -116,7 +116,8 @@ Things to note:
 ### 🎧 Music
 
 Currently supports links that have audio (e.g. YouTube, Soundcloud).
-Functions thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dlp)
+
+Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dlp).
 
 - `?play <link>` - start audio playback
 - `?pause` - pause audio playback
