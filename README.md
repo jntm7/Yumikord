@@ -219,12 +219,8 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 
 ### 🔉 Audio Playback
 
-- ```?play https://youtu.be/dQw4w9WgXcQ```            
-- ```?pause https://youtu.be/dQw4w9WgXcQ```                                      
-- ```?resume https://youtu.be/dQw4w9WgXcQ```                                     
-- ```?stop https://youtu.be/dQw4w9WgXcQ```                                       
-- ```?loop https://youtu.be/dQw4w9WgXcQ```                                        
-- ```?endloop https://youtu.be/dQw4w9WgXcQ```                                    
+- ```?play https://youtu.be/dQw4w9WgXcQ```
+- ```?play https://soundcloud.com/centralcee-music/obsessed-with-you```
 
 ### 🔴 Pokémon Information
 
