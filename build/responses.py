@@ -462,6 +462,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             `weather in <city>` - Displays the current weather in the specified city.
             `translate <text> <source_language> <target_language>` - Translates text from one language to another.
             `dictionary.<word>` - Defines a word.
+            `color` - Generates a random color palette.
             
             `?play <link>` - start audio playback from a specified link
             `?pause` - pause audio playback
@@ -548,6 +549,10 @@ def get_response(user_input: str, user_id: str = None) -> str:
         except ValueError:
             return 'Invalid value for conversion. Please enter a numeric value.'
     
+    # Color Palette
+    elif 'color' in lowered:
+        return get_color_palette()
+
     # Memes
     elif 'meme' in lowered:
         return get_meme()
