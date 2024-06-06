@@ -109,6 +109,9 @@ Things to note:
 - `translate <text> <sourcelanguage> <targetlanguage>`
     - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
     - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
+- `dictionary.<word>`
+    - currently only English is supported
+    - [Thanks to FreeDictionaryAPI](https://dictionaryapi.dev)
 - `subreddit.<subredditname>`: (CURRENTLY OUT OF SERVICE)
     - retrieves the latest posts from a specified subreddit
     - [Thanks to PushShift](https://pushshift.io/)
