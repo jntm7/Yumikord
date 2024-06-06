@@ -32,7 +32,6 @@ def calculator(user_input: str) -> str:
         operator = tokens[1]    
         num2 = float(tokens[2])
 
-        # Operations
         if operator == '+':
             result = num1 + num2
         elif operator == '-':
@@ -40,28 +39,24 @@ def calculator(user_input: str) -> str:
         elif operator == '*':
             result = num1 * num2
         elif operator == '/':
-            # if user tries to divide by zero
             if num2 == 0: 
                 return 'Division by zero is not possible.'
             result = num1 / num2
         else:
             return 'Please enter a valid operator: +, -, *, /.'
 
-        # Integer or Float output depending on input
         if isinstance(num1, int) and isinstance(num2, int): 
-            return f'{int(result)}'  # Return integer result
+            return f'{int(result)}'
         else:
-            return f'{result}'  # Return float result
+            return f'{result}'
 
-    # if user enters invalid float
     except ValueError:
         return 'Please enter valid numbers for calculation.'
 
 def validate_expression(expression: str) -> bool:
-    # Validates if the expression contains at least one number and one operator
     return any(char.isdigit() for char in expression) and any(char in expression for char in ['+', '-', '*', '/'])
 
-# World Time API
+# World Time
 def get_current_time(city):
     try:
         timezones_response = requests.get('https://worldtimeapi.org/api/timezone')
@@ -81,7 +76,7 @@ def get_current_time(city):
     except Exception as e:
         return f"Couldn't retrieve the time for {city}. Please try again later! ({e})"
 
-# World Weather API
+# World Weather
 def get_weather(city: str) -> str:
     try:
         cities_response = requests.get('https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json')
@@ -109,7 +104,7 @@ def get_weather(city: str) -> str:
     except Exception as e:
         return f"Couldn't retrieve the weather for {city}. Please try again later! ({e})"
 
-# Google Translate API
+# Translate
 translator = Translator()
 def translate_text(text: str, source_language: str, target_language: str) -> tuple:
     try:
@@ -117,6 +112,32 @@ def translate_text(text: str, source_language: str, target_language: str) -> tup
         return translated.text, translated.pronunciation
     except Exception as e:
         return f"An error occurred: {str(e)}", None,
+
+# Dictionary
+def get_dictionary(word: str) -> str:
+    try:
+        response = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}")
+        response.raise_for_status()
+        data = response.json()
+
+        if isinstance(data, list):
+            definitions = data[0].get('meanings', [])
+            if not definitions:
+                return f"No definitions found for the word: {word}"
+            
+            definition_text = f"Definitions for '{word}':\n"
+            for meaning in definitions:
+                part_of_speech = meaning.get('partOfSpeech', 'Unknown')
+                definitions_list = meaning.get('definitions', [])
+                
+                for i, definition in enumerate(definitions_list, start=1):
+                    definition_text += f"{i}. ({part_of_speech}) {definition.get('definition')}\n"
+
+            return definition_text.strip()
+        else:
+            return f"Couldn't find the word '{word}'. Please check the spelling and try again."
+    except Exception as e:
+        return f"Couldn't retrieve any dictionary information. Please try again later! ({e})"
 
 # Unit Conversion
 def convert_units(value: float, from_unit: str, to_unit: str, conversion_factors: dict) -> str:
@@ -165,7 +186,25 @@ def convert_units(value: float, from_unit: str, to_unit: str, conversion_factors
     if conversion_factor is None:
         return f"No conversion factor found for {from_unit} to {to_unit}."
     converted_value = value * conversion_factor
-    return f"{value} {from_unit} is {converted_value:.2f} {to_unit}" # .2f = 2 decimal places
+    return f"{value} {from_unit} is {converted_value:.2f} {to_unit}"
+
+# Color Palette
+def get_color_palette() -> str:
+    try:
+        data = {"model": "default"}
+        response = requests.post("http://colormind.io/api/", json=data)
+        response.raise_for_status()
+        color_data = response.json()
+        color_palette = color_data.get("result")
+        
+        if not color_palette:
+            return "There was no color palette received from the API. Please try again later!"
+        color_text = "Generated Color Palette:\n"
+        for color in color_palette:
+            color_text += f"RGB: {color}\n"
+        return color_text
+    except Exception as e:
+        return f"Couldn't retrieve any color palettes right now. Please try again later! ({e})"
 
 # Memes API
 def get_meme() -> str:
@@ -328,7 +367,7 @@ def random_number(command: str) -> str:
         max_val = int(max_val)
         return f'Your random number is {random.randint(min_val, max_val)}'
     except ValueError:
-        return 'Please provide valid nubmers for the range.'
+        return 'Please provide valid numbers for the range.'
 
 # Rock Paper Scissors
 active_rps = {}
@@ -408,11 +447,11 @@ def choose_random_response(user_input: str) -> str:
 def get_response(user_input: str, user_id: str = None) -> str:
     lowered: str = user_input.lower()
 
-    # no message
+    # No Message
     if lowered == '':
         return 'Well, this is awkward...'
     
-    # help
+    # Help
     elif lowered == 'help':
             help_text = """
             **Here are my supported commands:**
@@ -451,7 +490,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             """
             return help_text
 
-    # calculator
+    # Calculator
     elif 'calculate' in lowered:
         expression = lowered.replace('calculate', '', 1).strip()
         if validate_expression(expression):
@@ -459,7 +498,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
         else:
             return 'Please enter a valid calculation expression.'
 
-    # world timezone clock
+    # World Clock
     elif 'time in' in lowered:
          city = lowered.replace('time in', '', 1).strip()
          if city:
@@ -467,7 +506,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
          else:
              return 'Please enter a valid city name.'
          
-    # world weather information
+    # World Weather
     elif 'weather in' in lowered:
         city = lowered.replace('weather in', '', 1).strip()
         if city:
@@ -475,7 +514,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
         else:
             return 'Please enter a valid city name.'
 
-    # translate
+    # Translate
     elif lowered.startswith('translate'):
         segments = lowered.split(' ', 4)
         if len(segments) < 4:
@@ -489,7 +528,12 @@ def get_response(user_input: str, user_id: str = None) -> str:
         else:
             return f"Translated Text:\n{translated_text}"
 
-    # unit converter
+    # Dictionary
+    elif lowered.startswith('dictionary.'):
+        word = lowered.split('.', 1)[1]
+        return get_dictionary(word)
+
+    # Unit Converter
     elif lowered.startswith('convert'):
         segments = lowered.split(' ')
         if len(segments) < 4:
@@ -503,30 +547,30 @@ def get_response(user_input: str, user_id: str = None) -> str:
         except ValueError:
             return 'Invalid value for conversion. Please enter a numeric value.'
     
-    # memes
+    # Memes
     elif 'meme' in lowered:
         return get_meme()
     
-    # jokes
+    # Jokes
     elif 'joke' in lowered:
         return get_joke()
     
-    # quotes
+    # Quotes
     elif 'quote' in lowered:
         return get_quote()
     
-    # facts
+    # Facts
     elif 'fact' in lowered:
         return get_fact()
     
-    # reddit subreddit fetcher
+    # Reddit Subreddit Fetcher
     elif lowered.startswith('subreddit.'):
         subreddit = lowered.split('.')[1].strip()
         if len(subreddit) < 1:
             return 'Please enter a valid subreddit.'
         return get_subreddit_posts(subreddit)
     
-    # pokemon information
+    # Pokemon Information
     elif lowered.startswith('pokemon.'):
         segments = lowered.split('.')
         if len(segments) < 2:
@@ -534,42 +578,42 @@ def get_response(user_input: str, user_id: str = None) -> str:
         pokemon_name = segments[1].strip()
         return get_pokemon_info(pokemon_name)
     
-    # waifu image
+    # Waifu Image
     elif lowered == 'waifu':
         return get_waifu_image()
     elif lowered == 'waifu.nsfw':
         return get_waifu_image(nsfw=True)
     
-    # anime facts
+    # Anime Facts
     elif 'anime' in lowered:
         return get_anime_fact()
     
-    # cat gifs
+    # Cat Images
     elif 'cat' in lowered:
         return get_cat()
     
     # OTHER RESPONSES
-    # hello  
+    # Hello  
     elif 'hello' in lowered:
         return 'Hello there!'
     
-    # how are you
+    # How are you
     elif 'how are you' in lowered:
         return 'Great, thanks!'
     
-    # roll dice
+    # Roll Dice
     elif 'dice' in lowered:
         return f'You rolled: {roll_dice()}'
     
-    # flip coin
+    # Flip Coin
     elif 'coin' in lowered:
         return f'You got: {flip_coin()}'
     
-    # random number
+    # Random Number
     elif 'number' in lowered:
         return f'You got: {random_number()}'
     
-    # rock paper scissors
+    # Rock Paper Scissors
     elif lowered == 'play.rps':
         active_rps[user_id] = True
         return "Let's play Rock-Paper-Scissors! Type 'rock', 'paper', or 'scissors' to make your choice."
@@ -577,7 +621,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
     elif user_id in active_rps and lowered in ['rock', 'paper', 'scissors']:
         return play_rps(user_id, lowered)
     
-    # number guesser
+    # Number Guesser
     elif lowered == 'play.guess':
         return start_guesser(user_id)
     
