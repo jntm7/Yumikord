@@ -385,9 +385,9 @@ def play_rps(user_id, user_choice):
     elif (user_choice == 'rock' and bot_choice == 'scissors') or \
          (user_choice == 'paper' and bot_choice == 'rock') or \
          (user_choice == 'scissors' and bot_choice == 'paper'):
-        return f"You chose {user_choice} and I chose {bot_choice}. You win! Congratulations!"
+        return f"You chose {user_choice} and I chose {bot_choice}. You win, congratulations!"
     else:
-        return f"You chose {user_choice} and I chose {bot_choice}. You lose! Better luck next time!"
+        return f"You chose {user_choice} and I chose {bot_choice}. You lose, better luck next time!"
 
 # Number Guesser
 game_states = {}
@@ -395,7 +395,7 @@ game_states = {}
 def start_guesser(user_id):
     secret_number = random.randint(1,100)
     attempts = 0
-    max_attempts = 7
+    max_attempts = 8
     game_states[user_id] = {'number': secret_number, 'attempts': attempts}
     return f"I've chosen a number between 1 and 100. Can you guess it? I'll give you {max_attempts} chances. Let's start!\n"
 
@@ -406,7 +406,7 @@ def play_guesser(user_id, guess):
     game_state = game_states[user_id]
     secret_number = game_state['number']
     attempts = game_state['attempts'] + 1
-    max_attempts = 7
+    max_attempts = 8
     response = ""
 
     try:
