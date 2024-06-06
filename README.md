@@ -181,15 +181,15 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 
 ### 🧮 Unit Converter
 
-- ```convert 10 mi km```         to convert 10 miles to kilometres
-- ```convert 6 ft m```           to convert 6 feet to metres
-- ```convert 12 in cm```         to convert 12 inches to centimetres
-- ```convert 45 lb kg```         to convert 45 pounds to kilograms
+- ```convert 10 mi km```         
+- ```convert 6 ft m```           
+- ```convert 12 in cm```         
+- ```convert 45 lb kg```         
 
 ### 🌡️ Temperature Converter
 
-- ```convert 15 c f```         to convert 15 Celsius to Fahrenheit
-- ```convert 85 f c```         to convert 85 Fahrenheit to Celsius
+- ```convert 15 c f```         
+- ```convert 85 f c```         
 
 ### 🕒 World Clock
 
@@ -207,21 +207,21 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 
 ### 🗣️ Translator
 
-- ```translate apple en fr```             to translate apple in English to French
-- ```translate ありがとう jp es```         to translate thank you in Japanese to Spanish
-- ```translate krapfen de zh-CN```        to translate donut in German to Chinese
+- ```translate apple en fr```             
+- ```translate ありがとう jp es```         
+- ```translate krapfen de zh-CN```        
 
 ### 🔉 Audio Playback
 
-- ```?play https://youtu.be/dQw4w9WgXcQ```          to start audio playback
-- ```?pause```                                      to pause audio playback
-- ```?resume```                                     to resume audio playback
-- ```?stop```                                       to terminate audio playback (bot will automatically disconnect from the voice channel).
-- ```?loop```                                       to start looping audio playback (TEMPORARILY DISABLED)
-- ```?endloop```                                    to stop looping audio playback (TEMPORARILY DISABLED)
+- ```?play https://youtu.be/dQw4w9WgXcQ```          
+- ```?pause```                                      
+- ```?resume```                                     
+- ```?stop```                                       
+- ```?loop```                                        
+- ```?endloop```                                    
 
 ### 🔴 Pokémon Information
 
-- ```pokemon.pikachu```        for information on Pikachu
-- ```pokemon.bulbasaur```      for information on Bulbasaur
-- ```pokemon.charizard```      for information on Charizard
+- ```pokemon.pikachu```        
+- ```pokemon.bulbasaur```      
+- ```pokemon.charizard```      
