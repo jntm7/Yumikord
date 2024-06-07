@@ -208,14 +208,13 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> str
         response = requests.get(f"https://api.frankfurter.app/latest?amount={amount}&from={from_currency}&to={to_currency}")
         response.raise_for_status()
         data = response.json()
-        conversion_rate = data['rates'].get(to_currency)
-        if conversion_rate:
-            converted_amount = amount * conversion_rate
+        converted_amount = data['rates'].get(to_currency)
+        if converted_amount:
             return f"{amount} {from_currency} is {converted_amount:.2f} {to_currency}."
         else:
-            return f"Currency {to_currency} not found. Please enter a valid currency."
+            return f"Currency {to_currency} not found."
     except Exception as e:
-        return f"Couldn't retrieve conversion rate information. Please try again later! ({e})"
+        return f"Couldn't retrieve conversion rate. Please try again later! ({e})"
 
 # Color Palette
 def get_color_palette() -> str:
@@ -601,7 +600,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             to_currency = parts[3].upper()
             return convert_currency(amount, from_currency, to_currency)
         else:
-            return "Please provide the conversion in the format: exchange.<amount>.<currency>.<currency>."
+            return "Please provide the conversion in the format exchange.<amount>.<currency>.<currency>."
 
     # Color Palette
     elif 'color' in lowered:

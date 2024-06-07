@@ -29,7 +29,7 @@ ffmpeg_options = {'options': '-vn -filter:a "volume=0.50"'}
 async def on_ready() -> None:
     print(f'{client.user} is now running!')
 
-# Audio Playback
+# Audio Player
 class AudioPlayer:
     def __init__(self):
         self.looping = False
@@ -162,6 +162,7 @@ async def send_message(message: Message, user_message: str) -> None:
     except Exception as e:
         print(e)
 
+# Disconnect from voice channel
 def signal_handler(sig, frame):
     print("Shutting down...")
     for guild_id, voice_client in audio_player.voice_clients.items():
