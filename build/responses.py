@@ -104,6 +104,27 @@ def get_weather(city: str) -> str:
     except Exception as e:
         return f"Couldn't retrieve the weather for {city}. Please try again later! ({e})"
 
+# Hacker News API
+def get_hackernews() -> str:
+    try:
+        response = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+        response.raise_for_status()
+        top_stories = response.json()
+
+        if not top_stories:
+            return "Couldn't retrieve any top stories from Hacker News right now. Please try again later!"
+
+        id = top_stories[0]
+        story_response = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{id}.json")
+        story_response.raise_for_status()
+        story_data = story_response.json()
+
+        title = story_data.get('title', 'no title')
+        url = story_data.get('url', 'no url')
+        return f"Top Hacker News Story: {title}\n {url}"
+    except Exception as e:
+        return f"Couldn't retrieve any top stories from Hacker News right now. Please try again later! ({e})"
+
 # Translate
 translator = Translator()
 def translate_text(text: str, source_language: str, target_language: str) -> tuple:
@@ -188,7 +209,7 @@ def convert_units(value: float, from_unit: str, to_unit: str, conversion_factors
     converted_value = value * conversion_factor
     return f"{value} {from_unit} is {converted_value:.2f} {to_unit}"
 
-# Exchange Rate
+# Exchange Rate API
 def get_exchange_rate(from_currency: str, to_currency: str) -> str:
     try:
         response = requests.get(f"https://api.frankfurter.app/latest?from={from_currency}&to={to_currency}")
@@ -202,7 +223,7 @@ def get_exchange_rate(from_currency: str, to_currency: str) -> str:
     except Exception as e:
         return "Couldn't retrieve exchange rate information. Please try again later! ({e})"
 
-# Currency Conversion
+# Currency Conversion API
 def convert_currency(amount: float, from_currency: str, to_currency: str) -> str:
     try:
         response = requests.get(f"https://api.frankfurter.app/latest?amount={amount}&from={from_currency}&to={to_currency}")
@@ -216,7 +237,7 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> str
     except Exception as e:
         return f"Couldn't retrieve conversion rate. Please try again later! ({e})"
     
-# Cryptocurrency
+# Cryptocurrency API
 def get_crypto(id):
     try:
         response = requests.get(f"https://api.coincap.io/v2/assets/{id}")
@@ -234,7 +255,7 @@ def get_crypto(id):
     except Exception as e:
         return f"Couldn't fetch cryptocurrency data. Please try again later! {e}"
 
-# Color Palette
+# Color Palette API
 def get_color_palette() -> str:
     try:
         data = {"model": "default"}
@@ -275,6 +296,17 @@ def get_joke() -> str:
     except Exception as e:
         return f"Couldn't retrieve any jokes right now. Please try again later! ({e})"
 
+# Dad Jokes API
+def get_dadjoke() -> str:
+    try:
+        headers = {'Accept': 'application/json'}
+        response = requests.get("https://icanhazdadjoke.com", headers = headers)
+        response.raise_for_status()
+        data = response.json()
+        return data ['dadjoke']
+    except Exception as e:
+        return f"COuldn't retrieve any dad jokes right now. Please try again later! ({e})"
+
 # Quotes API
 def get_quote() -> str:
     try:
@@ -295,6 +327,50 @@ def get_fact() -> str:
         return f"{fact_text}"
     except Exception as e:
         return f"Couldn't retrieve any facts right now. Please try again later! ({e})"
+    
+# Advice API
+def get_advice() -> str:
+    try:
+        response = requests.get("https://api.adviceslip.com/advice")
+        response.raise_for_status()
+        data = response.json()
+        advice = data['slip']['advice']
+        return advice
+    except Exception as e:
+        return f"Couldn't retrieve any advice right now. Please try again later! ({e})"
+
+# Affirmation API
+def get_affirmation() -> str:
+    try:
+        response = requests.get("https://affirmations.dev")
+        response.raise_for_status()
+        data = response.json()
+        affirmation = data['affirmation']
+        return affirmation
+    except Exception as e:
+        return f"Couldn't retrieve any affirmations right now. Please try again later! ({e})"
+
+# Inspiration API
+def get_inspiration() -> str:
+    try:
+        response = requests.get("https://api.fisenko.net/v1/quotes/en/random")
+        response.raise_for_status()
+        data = response.json()
+        inspiration = f'"{data["text"]}"\n— {data["author"]["name"]}'
+        return inspiration
+    except Exception as e:
+        return f"Couldn't retrieve any inspiration right now. Please try again later! ({e})"
+
+# Yes / No API
+def get_yes_no_gif() -> str:
+    try:
+        response = requests.get("https://yesno.wtf/api")
+        response.raise_for_status()
+        data = response.json()
+        yesno = data['image']
+        return yesno
+    except Exception as e:
+        return f"Couldn't retrieve any yes/no GIFs right now. Please try again later! ({e})"
 
 # Pokemon API
 def get_pokemon_info(pokemon_name):
@@ -445,6 +521,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             `rate.<from_currency>.<to_currency>` - Fetches the exchange rate between two currencies.
             `exchange.<amount>.<from_currency>.<to_currency>` - Converts an amount in one currency to another.
             `crypto.<name>` - Fetches information for a specified cryptocurrency.
+            `hackernews` - Fetches the top story from Hacker News.
             
             `time in <city>` - Displays the current time in the specified city.
             `weather in <city>` - Displays the current weather in the specified city.
@@ -467,17 +544,19 @@ def get_response(user_input: str, user_id: str = None) -> str:
             `play.guess` - Play a game of number guessing.
             `guess.<number>` - Input after starting the number guessing game.
 
-            `joke` - Tells you a random joke.
-            `fact` - Tells you a random fact.
+            `joke` - Tells a random joke.
+            `dadjoke` - Tells a random dad joke.
+            `fact` - Tells a random fact.
             `meme` - Fetches a random meme.
             `quote` - Fetches a random quote.
-            `cat` - Fetches a random cat image.
-            
+            `advice` - Fetches random advice.
+            `affirm` - Fetches a random affirmation.
+            `inspire` - Fetches a random inspirational quote.
+
+            `yesno` - Fetches a "Yes" GIF or a "No" GIF (randomized).
             `waifu` - Fetches a random SFW waifu image.
             `waifu.nsfw` - Fetches a random NSFW waifu image.
-            `animefact` - Provides a random anime fact.
             `pokemon.<pokemon_name>` - Provides information about the specified Pokémon.
-            `subreddit.<subreddit_name>` - Fetches posts from the specified subreddit.
             """
             return help_text
 
@@ -504,6 +583,10 @@ def get_response(user_input: str, user_id: str = None) -> str:
             return get_weather(city)
         else:
             return 'Please enter a valid city name.'
+        
+    # Hacker News
+    elif 'hackernews' in lowered:
+        return get_hackernews()
 
     # Translate
     elif lowered.startswith('translate'):
@@ -581,6 +664,9 @@ def get_response(user_input: str, user_id: str = None) -> str:
     elif 'joke' in lowered:
         return get_joke()
     
+    elif 'dadjoke' in lowered:
+        return get_dadjoke()
+    
     # Quotes
     elif 'quote' in lowered:
         return get_quote()
@@ -588,6 +674,21 @@ def get_response(user_input: str, user_id: str = None) -> str:
     # Facts
     elif 'fact' in lowered:
         return get_fact()
+    
+    elif 'advice' in lowered:
+        return get_advice()
+    
+    # Affirmation
+    elif 'affirm' in lowered:
+        return get_affirmation()
+
+    # Inspiration
+    elif 'inspire' in lowered:
+        return get_inspiration()
+    
+    # Yes / No GIF
+    elif 'yesno' in lowered:
+        return get_yes_no_gif()
     
     # Pokemon Information
     elif lowered.startswith('pokemon.'):
