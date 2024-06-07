@@ -81,10 +81,9 @@ Things to note:
 
 - `hello`
 - `how are you`
-- `help` - to prompt the bot to list all its capable commands
+- `help` - to prompt the bot to list all its available commands
 
 ### 🔨 Tools
-
 
 - `calculate`: 
     - supported operations: 
@@ -114,6 +113,8 @@ Things to note:
 - `weather in <city>`
     - [Thanks to wttr.in](https://wttr.in)
     - [complete list of supported cities](https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json)
+- `hackernews`
+    - [Thanks to Hacker News API (Official)](https://github.com/HackerNews/API)
 - `translate <text> <sourcelanguage> <targetlanguage>`
     - [Thanks to Google Translate API (unofficial)](https://pypi.org/project/googletrans/)   
     - [complete list of supported ISO 639 language codes](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g. en for English, fr for French, zh-CN for Chinese)
@@ -154,23 +155,24 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 ### 🎉 Fun
 
 - `meme`:
-    - retrieves a random meme
     - [Thanks to MemeAPI](https://meme-api.com/)
 - `joke`:
-    - retrives a random joke
     - [Thanks to JokeAPI](https://v2.jokeapi.dev/)
+- `dadjoke`:
+    - [Thanks to icanhazdadjoke](https://icanhazdadjoke.com/api)
 - `quote`:
-    - retrieves a random quote
     - [Thanks to ZenQuotes](https://zenquotes.io)
 - `fact`:
-    - retrieves a random fact
     - [Thanks to UselessFacts](https://uselessfacts.jsph.pl)
+- `advice`:
+    - [Thanks to Advice Slip JSON API](https://api.adviceslip.com)
+- `affirm`:
+    - [Thanks to Affirmations.dev](https://affirmations.dev)
+- `inspire`:
+    - [Thanks to Dictum API](https://github.com/fisenkodv/dictum)
 - `pokemon.<pokemonname>`:
-    - retrieves information for a Pokémon
     - [Thanks to PokeAPI](https://pokeapi.co/)
-- `waifu`:
-    - retrieves a random SFW waifu image
-    - retrieve a random NSFW waifu image with `waifu.nsfw`
+- `waifu` (SFW) `waifu.nsfw` (NSFW):
     - [Thanks to Waifu.im](https://docs.waifu.im)
 
 ## ⌨️ Basic Usage Examples
