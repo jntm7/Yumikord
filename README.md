@@ -81,10 +81,11 @@ Things to note:
 
 - `hello`
 - `how are you`
+- `help` - to prompt the bot to list all its capable commands
 
 ### 🔨 Tools
 
-- `help` - to prompt the bot to list all its capable commands
+
 - `calculate`: 
     - supported operations: 
         - addition (`+`)
@@ -105,6 +106,8 @@ Things to note:
     - [Thanks to Frankfurter](https://www.frankfurter.app)
 - `exchange.<amount>.<currency1>.<currency2>`
     - [Thanks to Frankfurter](https://www.frankfurter.app)
+- `crypto.<name>`
+    - [Thanks to CoinCap](https://docs.coincap.io)
 - `time in <city>`
     - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
@@ -117,8 +120,6 @@ Things to note:
 - `dictionary.<word>`
     - currently only English is supported
     - [Thanks to FreeDictionaryAPI](https://dictionaryapi.dev)
-- `subreddit.<subredditname>`: (CURRENTLY OUT OF SERVICE)
-    - [Thanks to PushShift](https://pushshift.io/)
 - `color`
     - [Thanks to Colormind](http://colormind.io/api/)
 
@@ -171,13 +172,6 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
     - retrieves a random SFW waifu image
     - retrieve a random NSFW waifu image with `waifu.nsfw`
     - [Thanks to Waifu.im](https://docs.waifu.im)
-- `anime`: (CURRENTLY OUT OF SERVICE)
-    - retrieves a random anime fact
-    - [Thanks to Anime Facts Rest API](https://chandan-02.github.io/anime-facts-rest-api/)
-- `cat`: (CURRENTLY OUT OF SERVICE)
-    - retrieves a random cat image
-    - [Thanks to CATAAS (Cat As A Service)](https://cataas.com)
-
 
 ## ⌨️ Basic Usage Examples
 
@@ -211,6 +205,12 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 - ```exchange.50.USD.CAD```
 - ```exchange.25.EUR.JPY```
 - ```exchange.10.KRW.CNY```
+
+### 🪙 Cryptocurrency Information
+
+- ```crypto.bitcoin```
+- ```crypto.ethereum```
+- ```crypto.dogecoin```
 
 ### 🕒 World Clock
 

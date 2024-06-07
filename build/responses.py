@@ -215,6 +215,24 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> str
             return f"Currency {to_currency} not found."
     except Exception as e:
         return f"Couldn't retrieve conversion rate. Please try again later! ({e})"
+    
+# Cryptocurrency
+def get_crypto(id):
+    try:
+        response = requests.get(f"https://api.coincap.io/v2/assets/{id}")
+        response.raise_for_status()
+        data = response.json()
+        asset_data = data['data']
+        name = asset_data['name']
+        symbol = asset_data['symbol']
+        rank = asset_data['rank']
+        supply = asset_data['supply']
+        max_supply = asset_data['maxSupply']
+        market_cap_usd = asset_data['marketCapUsd']
+        price = asset_data['priceUsd']
+        return f"Name: {name}\nSymbol: {symbol}\nRank: {rank}\nSupply: {supply}\nMax Supply: {max_supply}\nMarket Cap USD: ${market_cap_usd}\nPrice: ${price}"
+    except Exception as e:
+        return f"Couldn't fetch cryptocurrency data. Please try again later! {e}"
 
 # Color Palette
 def get_color_palette() -> str:
@@ -278,27 +296,6 @@ def get_fact() -> str:
     except Exception as e:
         return f"Couldn't retrieve any facts right now. Please try again later! ({e})"
 
-# Reddit Subreddit Fetcher
-def get_subreddit_posts(subreddit, limit=3):
-    try:
-        response = requests.get("https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&limit={limit}")
-        response.raise_for_status()
-        posts = response.json()['data']
-        if posts:
-            return formatted_posts(posts)
-        else:
-            return "No posts found in the subreddit."
-    except Exception as e:
-        return f"Couldn't retrieve any posts from r/{subreddit} right now. Please try again later! ({e})"
-
-def formatted_posts(posts: list) -> str:
-    formatted = ""
-    for post in posts:
-        formatted += f"Title: {post['title']}\n"
-        formatted += f"Author: {post['author']}\n"
-        formatted += f"URL: {post['url']}\n"
-    return formatted
-
 # Pokemon API
 def get_pokemon_info(pokemon_name):
     try:
@@ -337,47 +334,6 @@ def get_waifu_image(nsfw: bool = False) -> str:
             return "Couldn't retrieve any waifu images right now. Please try again later!"
     except Exception as e:
         return f"Couldn't retrieve any waifu images right now. Please try again later! ({e})"
-
-# Anime Facts
-def get_anime_fact() -> str:
-    try:
-        anime_list_url = "https://anime-facts-rest-api.herokuapp.com/api/v1"
-        response = requests.get(anime_list_url)
-        response.raise_for_status()
-        anime_list = response.json().get('data', [])
-
-        if anime_list:
-            random_anime = random.choice(anime_list)
-            anime_name = random_anime['anime_name']
-
-            anime_facts_url = f"https://anime-facts-rest-api.herokuapp.com/api/v1/:{anime_name}"
-            response = requests.get(anime_facts_url)
-            response.raise_for_status()
-            anime_facts = response.json().get('data', [])
-
-            if anime_facts:
-                random_fact = random.choice(anime_facts)
-                return random_fact['fact']
-            else:
-                return "Couldn't retrieve any facts for this anime."
-        else:
-            return "Couldn't retrieve this anime."
-    except Exception as e:
-        return f"Couldn't retrieve any anime facts right now. Please try again later! ({e})"
-
-# Cat GIFs
-def get_cat() -> str:
-    try:
-        response = requests.get("https://www.cataas.com/cat?json=true")
-        response.raise_for_status()
-        cat_data = response.json()
-        if cat_data and 'url' in cat_data:
-            gif_url = f"https://cataas.com{cat_data['url']}"
-            return gif_url
-        else:
-            return "Couldn't retrieve any cats right now. Please try again later!"
-    except Exception as e:
-        return f"Couldn't retrieve any cats right now. Please try again later! ({e})"
 
 # Roll a dice
 def roll_dice() -> int:
@@ -488,6 +444,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             `convert <value> <from_unit> <to_unit>` - Converts a value from one unit to another.
             `rate.<from_currency>.<to_currency>` - Fetches the exchange rate between two currencies.
             `exchange.<amount>.<from_currency>.<to_currency>` - Converts an amount in one currency to another.
+            `crypto.<name>` - Fetches information for a specified cryptocurrency.
             
             `time in <city>` - Displays the current time in the specified city.
             `weather in <city>` - Displays the current weather in the specified city.
@@ -602,6 +559,16 @@ def get_response(user_input: str, user_id: str = None) -> str:
         else:
             return "Please provide the conversion in the format exchange.<amount>.<currency>.<currency>."
 
+    # Cryptocurrency Price
+    elif lowered.startswith('crypto'):
+        parts = lowered.split('.')
+        if len(parts) == 2:
+            id = parts[1].lower()
+            price_info = get_crypto(id)
+            return price_info
+        else:
+            return "Please provide the cryptocurrency symbol in the format crypto.<name>."
+
     # Color Palette
     elif 'color' in lowered:
         return get_color_palette()
@@ -622,13 +589,6 @@ def get_response(user_input: str, user_id: str = None) -> str:
     elif 'fact' in lowered:
         return get_fact()
     
-    # Reddit Subreddit Fetcher
-    elif lowered.startswith('subreddit.'):
-        subreddit = lowered.split('.')[1].strip()
-        if len(subreddit) < 1:
-            return 'Please enter a valid subreddit.'
-        return get_subreddit_posts(subreddit)
-    
     # Pokemon Information
     elif lowered.startswith('pokemon.'):
         segments = lowered.split('.')
@@ -642,15 +602,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
         return get_waifu_image()
     elif lowered == 'waifu.nsfw':
         return get_waifu_image(nsfw=True)
-    
-    # Anime Facts
-    elif 'anime' in lowered:
-        return get_anime_fact()
-    
-    # Cat Images
-    elif 'cat' in lowered:
-        return get_cat()
-    
+
     # OTHER RESPONSES
     # Hello  
     elif 'hello' in lowered:
