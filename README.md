@@ -100,6 +100,10 @@ Things to note:
         - pounds (lbs) + kilograms (kg)
         - ounces (oz) + grams (g)
         - liters (l) + gallons (gal)
+- `rate.<currency1>.<currency2>`
+    - [Thanks to Frankfurter](https://www.frankfurter.app)
+- `exchange.<amount>.<currency1>.<currency2>`
+    - [Thanks to Frankfurter](https://www.frankfurter.app)
 - `time in <city>`
     - [Thanks to WorldTimeAPI](https://worldtimeapi.org)
     - [complete list of supported timezones and cities](https://worldtimeapi.org/api/timezone/)
