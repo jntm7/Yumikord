@@ -6,8 +6,8 @@ import signal
 import sys
 from typing import Final
 from dotenv import load_dotenv
-from discord import Intents, Client, Message
-from responses import get_response
+from discord import Intents, Client, Message, Embed
+from responses import get_response, choose_random_response
 
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
@@ -28,6 +28,24 @@ ffmpeg_options = {'options': '-vn -filter:a "volume=0.50"'}
 @client.event
 async def on_ready() -> None:
     print(f'{client.user} is now running!')
+
+# Help
+async def send_help_embed(channel, commands):
+    max_fields = 25
+    embeds = []
+    embed = Embed(title="Help", description="Here are the commands you can use:", color=0x00ff00)
+
+    for i, (command, description) in enumerate(commands.items()):
+        embed.add_field(name=command, value=description, inline=False)
+        if (i + 1) % max_fields == 0:
+            embeds.append(embed)
+            embed = Embed(title="Help (continued)", color=0x00ff00)
+  
+    if len(embed.fields) > 0:
+        embeds.append(embed)
+    
+    for embed in embeds:
+        await channel.send(embed=embed)
 
 # Audio Player
 class AudioPlayer:
@@ -94,6 +112,41 @@ class AudioPlayer:
 
 audio_player = AudioPlayer()
 
+# Reminder
+reminders = {}
+
+def parse_reminder(reminder_text):
+    try:
+        parts = reminder_text.split()
+        time_str = parts[0]
+        unit = parts[1].lower()
+        message = ' '.join(parts[2:])
+
+        if unit == 'seconds' or unit == 'second' or unit == 'sec' or unit == 's':
+            delay = int(time_str)
+        elif unit == 'minutes' or unit == 'minute' or unit == 'min' or unit == 'm':
+            delay = int(time_str) * 60
+        elif unit == 'hours' or unit == 'hour' or unit == 'hr' or unit == 'h':
+            delay = int(time_str) * 3600
+        else:
+            return None, None
+        return delay, message
+    except (ValueError, IndexError):
+        return None, None
+
+async def send_reminder(user_id, channel_id, message):
+    channel = client.get_channel(int(channel_id))
+    mention = f"<@{user_id}>"
+    await channel.send(f"{mention} Reminder: {message}")
+
+async def send_reminder_delayed(delay, user_id, channel_id, message):
+    await asyncio.sleep(delay)
+    await send_reminder(user_id, channel_id, message)
+
+async def schedule_reminder(delay, user_id, channel_id, message):
+    reminder_task = asyncio.create_task(send_reminder_delayed(delay, user_id, channel_id, message))
+    reminders[reminder_task] = (user_id, channel_id, message)
+
 ## Message
 @client.event
 async def on_message(message: Message) -> None:
@@ -105,6 +158,53 @@ async def on_message(message: Message) -> None:
     channel: str = str(message.channel)
 
     print(f'[{channel}] {username}: "{user_message}"')
+
+    # Help
+    if user_message.startswith('?help'):
+        commands = {
+            "?remind <time> <unit> <message>": "Set a reminder after a specified time with a message.",
+            "calculate <expression>": "Calculates the given mathematical expression.",
+            "convert <value> <from_unit> <to_unit>": "Converts a value from one unit to another.",
+            "rate.<from_currency>.<to_currency>": "Fetches the exchange rate between two currencies.",
+            "exchange.<amount>.<from_currency>.<to_currency>": "Converts an amount in one currency to another.",
+            "crypto.<name>": "Fetches information for a specified cryptocurrency.",
+            "hackernews": "Fetches the top story from Hacker News.",
+
+            "time in <city>": "Displays the current time in the specified city.",
+            "weather in <city>": "Displays the current weather in the specified city.",
+
+            "translate <text> <source_language> <target_language>": "Translates text from one language to another.",
+            "dictionary.<word>": "Defines a word.",
+            "color": "Generates a random color palette.",
+            
+            "?play <link>": "start audio playback from a specified link",
+            "?pause": "pause audio playback",
+            "?resume": "resume audio playback",
+            "?stop": "stop audio playback",
+            "?loop": "loop audio playback",
+            "?endloop": "stop looping audio playback",
+
+            "dice": "Rolls a 6-sided dice.",
+            "coin": "Flips a 2-sided coin.",
+            "number <min> <max>`": "Generates a random number between a specified range.",
+            "play.rps": "Play a game of rock-paper-scissors.",
+            "play.guess": "Play a game of number guessing.",
+            "guess.<number>": "Input after starting the number guessing game.",
+
+            "joke": "Tells a random joke.",
+            "dadjoke": "Tells a random dad joke.",
+            "fact": "Tells a random fact.",
+            "meme": "Fetches a random meme.",
+            "quote": "Fetches a random quote.",
+            "advice": "Fetches random advice.",
+            "affirm": "Fetches a random affirmation.",
+            "inspire": "Fetches a random inspirational quote.",
+
+            "yesno": "Fetches a 'Yes' GIF or a 'No' GIF (randomized).",
+            "waifu | waifu.nsfw": "Fetches a random SFW | NSFW waifu image.",
+            "pokemon.<pokemon_name>": "Fetches information about the specified Pokémon.",
+        }
+        await send_help_embed(message.channel, commands)
 
     # Audio Commands
     if user_message.startswith('?play'):
@@ -145,6 +245,16 @@ async def on_message(message: Message) -> None:
         else:
             await message.channel.send("Please join a voice channel to use this command.")
 
+    # Reminder
+    elif user_message.startswith('?remind'):
+        reminder_text = ' '.join(user_message.split()[1:])
+        delay, reminder_message = parse_reminder(reminder_text)
+        if delay is None or reminder_message is None:
+            await message.channel.send("Invalid reminder format. Please use: ?remind <time> <unit> <message>")
+        else:
+            await schedule_reminder(delay, str(message.author.id), str(message.channel.id), reminder_message)
+            await message.channel.send(f"Reminder set for {delay} seconds: {reminder_message}. I'll notify you when the time is up.")
+
     else:
         response = get_response(user_message, str(message.author.id))
         await message.channel.send(response)
@@ -162,12 +272,16 @@ async def send_message(message: Message, user_message: str) -> None:
     except Exception as e:
         print(e)
 
-# Disconnect from voice channel
+# Disconnect
 def signal_handler(sig, frame):
     print("Shutting down...")
-    for guild_id, voice_client in audio_player.voice_clients.items():
-        asyncio.run_coroutine_threadsafe(voice_client.disconnect(), client.loop).result()
-    client.close()
+    async def close_client():
+        for vc in client.voice_clients:
+            await vc.disconnect()
+        await client.close()
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(close_client())
     sys.exit(0)
 
 def main() -> None:
