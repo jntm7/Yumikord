@@ -121,7 +121,7 @@ def get_hackernews() -> str:
 
         title = story_data.get('title', 'no title')
         url = story_data.get('url', 'no url')
-        return f"Top Hacker News Story: {title}\n {url}"
+        return f"Top Hacker News Story:\n {title}\n {url}"
     except Exception as e:
         return f"Couldn't retrieve any top stories from Hacker News right now. Please try again later! ({e})"
 
