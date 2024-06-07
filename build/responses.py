@@ -188,6 +188,35 @@ def convert_units(value: float, from_unit: str, to_unit: str, conversion_factors
     converted_value = value * conversion_factor
     return f"{value} {from_unit} is {converted_value:.2f} {to_unit}"
 
+# Exchange Rate
+def get_exchange_rate(from_currency: str, to_currency: str) -> str:
+    try:
+        response = requests.get(f"https://api.frankfurter.app/latest?from={from_currency}&to={to_currency}")
+        response.raise_for_status()
+        data = response.json()
+        rate = data['rates'].get(to_currency)
+        if rate:
+            return f"The exchange rate from {from_currency} to {to_currency} is {rate}."
+        else:
+            return f"Currency {from_currency} not found. Please enter a valid currency."
+    except Exception as e:
+        return "Couldn't retrieve exchange rate information. Please try again later! ({e})"
+
+# Currency Conversion
+def convert_currency(amount: float, from_currency: str, to_currency: str) -> str:
+    try:
+        response = requests.get(f"https://api.frankfurter.app/latest?amount={amount}&from={from_currency}&to={to_currency}")
+        response.raise_for_status()
+        data = response.json()
+        conversion_rate = data['rates'].get(to_currency)
+        if conversion_rate:
+            converted_amount = amount * conversion_rate
+            return f"{amount} {from_currency} is {converted_amount:.2f} {to_currency}."
+        else:
+            return f"Currency {to_currency} not found. Please enter a valid currency."
+    except Exception as e:
+        return f"Couldn't retrieve conversion rate information. Please try again later! ({e})"
+
 # Color Palette
 def get_color_palette() -> str:
     try:
@@ -535,7 +564,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
         word = lowered.split('.', 1)[1]
         return get_dictionary(word)
 
-    # Unit Converter
+    # Unit Conversion
     elif lowered.startswith('convert'):
         segments = lowered.split(' ')
         if len(segments) < 4:
@@ -549,6 +578,27 @@ def get_response(user_input: str, user_id: str = None) -> str:
         except ValueError:
             return 'Invalid value for conversion. Please enter a numeric value.'
     
+    # Exchange Rate
+    elif lowered.startswith('rate'):
+        parts = lowered.split('.')
+        if len(parts) == 2 and len(parts[1]) == 6:
+            from_currency = parts[1][:3].upper()
+            to_currency = parts[1][3:].upper()
+            return get_exchange_rate(from_currency, to_currency)
+        else:
+            return "Please provide the currencies in the format rate.<currency1><currency2>."
+
+    # Currency Conversion
+    elif lowered.startswith('exchange'):
+        parts = lowered.split('.')
+        if len(parts) == 4:
+            amount = float(parts[1])
+            from_currency = parts[2].upper()
+            to_currency = parts[3].upper()
+            return convert_currency(amount, from_currency, to_currency)
+        else:
+            return "Please provide the conversion in the format exchange.<amount>.<from_currency>.<to_currency>."
+
     # Color Palette
     elif 'color' in lowered:
         return get_color_palette()
