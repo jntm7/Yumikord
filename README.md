@@ -84,6 +84,7 @@ Things to note:
 
 ### 🔨 Tools
 
+- `help` - to prompt the bot to list all its capable commands
 - `calculate`: 
     - supported operations: 
         - addition (`+`)
@@ -117,10 +118,8 @@ Things to note:
     - currently only English is supported
     - [Thanks to FreeDictionaryAPI](https://dictionaryapi.dev)
 - `subreddit.<subredditname>`: (CURRENTLY OUT OF SERVICE)
-    - retrieves the latest posts from a specified subreddit
     - [Thanks to PushShift](https://pushshift.io/)
 - `color`
-    - generates a random color palette
     - [Thanks to Colormind](http://colormind.io/api/)
 
 ### 🎧 Music
@@ -200,6 +199,18 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 
 - ```convert 15 c f```         
 - ```convert 85 f c```         
+
+### 💱 Exchange Rate
+
+- ```rate.USD.CAD```
+- ```rate.EUR.JPY```
+- ```rate.KRW.CNY```
+
+### 💹 Currency Converter
+
+- ```exchange.50.USD.CAD```
+- ```exchange.25.EUR.JPY```
+- ```exchange.10.KRW.CNY```
 
 ### 🕒 World Clock
 
