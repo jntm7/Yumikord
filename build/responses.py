@@ -487,8 +487,12 @@ def get_response(user_input: str, user_id: str = None) -> str:
 
             `calculate <expression>` - Calculates the given mathematical expression.
             `convert <value> <from_unit> <to_unit>` - Converts a value from one unit to another.
+            `rate.<from_currency>.<to_currency>` - Fetches the exchange rate between two currencies.
+            `exchange.<amount>.<from_currency>.<to_currency>` - Converts an amount in one currency to another.
+            
             `time in <city>` - Displays the current time in the specified city.
             `weather in <city>` - Displays the current weather in the specified city.
+
             `translate <text> <source_language> <target_language>` - Translates text from one language to another.
             `dictionary.<word>` - Defines a word.
             `color` - Generates a random color palette.
@@ -581,12 +585,12 @@ def get_response(user_input: str, user_id: str = None) -> str:
     # Exchange Rate
     elif lowered.startswith('rate'):
         parts = lowered.split('.')
-        if len(parts) == 2 and len(parts[1]) == 6:
-            from_currency = parts[1][:3].upper()
-            to_currency = parts[1][3:].upper()
+        if len(parts) == 3:
+            from_currency = parts[1].upper()
+            to_currency = parts[2].upper()
             return get_exchange_rate(from_currency, to_currency)
         else:
-            return "Please provide the currencies in the format rate.<currency1><currency2>."
+            return "Please provide the currencies in the format: rate.<currency>.<currency>."
 
     # Currency Conversion
     elif lowered.startswith('exchange'):
@@ -597,7 +601,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             to_currency = parts[3].upper()
             return convert_currency(amount, from_currency, to_currency)
         else:
-            return "Please provide the conversion in the format exchange.<amount>.<from_currency>.<to_currency>."
+            return "Please provide the conversion in the format: exchange.<amount>.<currency>.<currency>."
 
     # Color Palette
     elif 'color' in lowered:
