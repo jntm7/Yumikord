@@ -23,7 +23,7 @@ Obtain your **Discord token** by:
 - Before resetting, scroll down to `Privileged Gateway Intents`
 - Assign the bot `MESSAGE CONTENT INTENT` (and `SERVER MEMBERS INTENT` if you choose to).
 - Click `Reset Token` and complete 2FA if it is enabled on your Discord account.
-- Copy your Discord token or come back to this step as we will need this in [Step 6](https://github.com/jntm7/discord-chatbot-catto?tab=readme-ov-file#step-6). 
+- Copy your Discord token or come back to this step as we will need this in [Step 6](https://github.com/jntm7/yumikord?tab=readme-ov-file#step-6). 
 
 ### 🔨 Step 3:
 
@@ -81,7 +81,14 @@ Things to note:
 
 - `hello`
 - `how are you`
-- `help` - to prompt the bot to list all its available commands
+- `bug`
+- `?help` 
+    - lists all available commands
+- `?remind <time> <unit> <message>`
+    - sets a reminder after <time> <unit> where unit =
+        - `seconds` (or `second`, `sec`, `s`)
+        - `minutes`(or `minute`, `min`, `m`)
+        - `hours` (or `hour`, `hr`, `h`)
 
 ### 🔨 Tools
 

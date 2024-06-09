@@ -2,27 +2,10 @@ import random
 from random import choice, randint
 from typing import Final
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from fuzzywuzzy import process
 from googletrans import Translator
 from urllib.parse import quote
-
-conversion_factors = {
-    'miles_to_km': 1.60934,
-    'km_to_miles': 0.621371,
-    'inches_to_cm': 2.54,
-    'cm_to_inches': 0.393701,
-    'feet_to_m': 0.3048,
-    'm_to_feet': 3.28084,
-    'yards_to_m': 0.9144,
-    'm_to_yards': 1.09361,
-    'pounds_to_kg': 0.453592,
-    'kg_to_pounds': 2.20462,
-    'ounces_to_grams': 28.3495,
-    'grams_to_ounces': 0.035274,
-    'liters_to_gallons': 0.264172,
-    'gallons_to_liters': 3.78541,
-}
 
 # Calculator
 def calculator(user_input: str) -> str:
@@ -161,6 +144,22 @@ def get_dictionary(word: str) -> str:
         return f"Couldn't retrieve any dictionary information. Please try again later! ({e})"
 
 # Unit Conversion
+conversion_factors = {
+    'miles_to_km': 1.60934,
+    'km_to_miles': 0.621371,
+    'inches_to_cm': 2.54,
+    'cm_to_inches': 0.393701,
+    'feet_to_m': 0.3048,
+    'm_to_feet': 3.28084,
+    'yards_to_m': 0.9144,
+    'm_to_yards': 1.09361,
+    'pounds_to_kg': 0.453592,
+    'kg_to_pounds': 2.20462,
+    'ounces_to_grams': 28.3495,
+    'grams_to_ounces': 0.035274,
+    'liters_to_gallons': 0.264172,
+    'gallons_to_liters': 3.78541,
+}
 def convert_units(value: float, from_unit: str, to_unit: str, conversion_factors: dict) -> str:
     unit_mapping = {
         'fahrenheit': 'f', 
@@ -495,11 +494,9 @@ def play_guesser(user_id, guess):
 # Response to an unsupported message
 def choose_random_response(user_input: str) -> str:
     responses: Final[str] = [
-        'I do not quite understand...',
-        'What are you talking about?',
-        'Do you mind rephrasing that?',
-        'Stop yapping nonsense.',
-        'Type "help" to learn more about what I can do.'
+        'Please refer to `?help` to learn more about what I can do.',
+        'Please use `?help` to view all my supported commands.',
+        'Please type `?help` to see all the supported features.',
     ]
     return random.choice(responses) if user_input else 'You did not say anything...'
 
@@ -511,54 +508,8 @@ def get_response(user_input: str, user_id: str = None) -> str:
     if lowered == '':
         return 'Well, this is awkward...'
     
-    # Help
-    elif lowered == 'help':
-            help_text = """
-            **Here are my supported commands:**
-
-            `calculate <expression>` - Calculates the given mathematical expression.
-            `convert <value> <from_unit> <to_unit>` - Converts a value from one unit to another.
-            `rate.<from_currency>.<to_currency>` - Fetches the exchange rate between two currencies.
-            `exchange.<amount>.<from_currency>.<to_currency>` - Converts an amount in one currency to another.
-            `crypto.<name>` - Fetches information for a specified cryptocurrency.
-            `hackernews` - Fetches the top story from Hacker News.
-            
-            `time in <city>` - Displays the current time in the specified city.
-            `weather in <city>` - Displays the current weather in the specified city.
-
-            `translate <text> <source_language> <target_language>` - Translates text from one language to another.
-            `dictionary.<word>` - Defines a word.
-            `color` - Generates a random color palette.
-            
-            `?play <link>` - start audio playback from a specified link
-            `?pause` - pause audio playback
-            `?resume` - resume audio playback
-            `?stop` - stop audio playback
-            `?loop` - loop audio playback
-            `?endloop` - stop looping audio playback
-
-            `dice` - Rolls a 6-sided dice.
-            `coin` - Flips a 2-sided coin.
-            `number <min> <max>` - Generates a random number between a specified range.
-            `play.rps` - Play a game of rock-paper-scissors.
-            `play.guess` - Play a game of number guessing.
-            `guess.<number>` - Input after starting the number guessing game.
-
-            `joke` - Tells a random joke.
-            `dadjoke` - Tells a random dad joke.
-            `fact` - Tells a random fact.
-            `meme` - Fetches a random meme.
-            `quote` - Fetches a random quote.
-            `advice` - Fetches random advice.
-            `affirm` - Fetches a random affirmation.
-            `inspire` - Fetches a random inspirational quote.
-
-            `yesno` - Fetches a "Yes" GIF or a "No" GIF (randomized).
-            `waifu` - Fetches a random SFW waifu image.
-            `waifu.nsfw` - Fetches a random NSFW waifu image.
-            `pokemon.<pokemon_name>` - Provides information about the specified Pokémon.
-            """
-            return help_text
+    elif 'bug' in lowered:
+        return 'For feature requests and bug reports, please review the [GitHub documentation](<https://github.com/jntm7/yumikord>). \nIf it is unable to be resolved, feel free to [open a new issue](<https://github.com/jntm7/Yumikord/issues>).\nPlease ensure the respective  labels `enhancement` for feature requests and `bug` for issues are assigned.'
 
     # Calculator
     elif 'calculate' in lowered:
@@ -742,4 +693,4 @@ def get_response(user_input: str, user_id: str = None) -> str:
         return play_guesser(user_id, guess)
 
     else:
-        return choose_random_response(lowered)
+        return choose_random_response(user_input)
