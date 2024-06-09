@@ -509,7 +509,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
         return 'Well, this is awkward...'
     
     elif 'bug' in lowered:
-        return 'For feature requests and bug reports, please review the [GitHub documentation](<https://github.com/jntm7/yumikord>). \nIf it is unable to be resolved, feel free to [open a new issue](<https://github.com/jntm7/Yumikord/issues>).\nPlease ensure the respective  labels `enhancement` for feature requests and `bug` for issues are assigned.'
+        return 'For feature requests and bug reports, please review the [GitHub documentation](<https://github.com/jntm7/yumikord>). \nIf it is unable to be resolved, feel free to [open a new issue](<https://github.com/jntm7/Yumikord/issues>).\nPlease ensure the respective labels `enhancement` for feature requests and `bug` for issues are assigned.'
 
     # Calculator
     elif 'calculate' in lowered:

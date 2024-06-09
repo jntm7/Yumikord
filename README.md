@@ -141,8 +141,8 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 - `?pause` - pause audio playback
 - `?resume` - resume audio playback
 - `?stop` - stop audio playback
-- `?loop` - loop audio playback
-- `?endloop` - stop looping audio playback
+- `?queue` - enqueue links for audio playback (when already playing)
+- `?endloop` - view queued links for audio playback
 
 ### 🎮 Game
 
@@ -244,7 +244,7 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 ### 🔉 Audio Playback
 
 - ```?play https://youtu.be/dQw4w9WgXcQ```
-- ```?play https://soundcloud.com/centralcee-music/obsessed-with-you```
+- ```?queue https://soundcloud.com/centralcee-music/obsessed-with-you```
 
 ### 🔴 Pokémon Information
 

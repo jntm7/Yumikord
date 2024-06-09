@@ -24,6 +24,14 @@ yt_dlp_options = {"format": "bestaudio/best"}
 ytdl = yt_dlp.YoutubeDL(yt_dlp_options)
 ffmpeg_options = {'options': '-vn -filter:a "volume=0.50"'}
 
+async def get_video_title(link):
+    try:
+        info = await asyncio.get_event_loop().run_in_executor(None, lambda: ytdl.extract_info(link, download=False))
+        return info.get('title', 'Unknown Title')
+    except Exception as e:
+        print(f"Error getting video title: {e}")
+        return 'Unknown Title'
+
 # Initiate
 @client.event
 async def on_ready() -> None:
@@ -50,20 +58,16 @@ async def send_help_embed(channel, commands):
 # Audio Player
 class AudioPlayer:
     def __init__(self):
-        self.looping = False
         self.link_to_play = ""
         self.guild_id = None
         self.voice_clients = {}
 
-    async def start_loop(self, link_to_play, guild_id):
-        self.looping = True
-        self.link_to_play = link_to_play
-        self.guild_id = guild_id
-        await self.loop_audio()
-
-    async def loop_audio(self):
-        while self.looping:
-            await self.play_audio(self.link_to_play, self.guild_id)
+    async def enqueue(self, link, guild_id):
+        if guild_id not in queues:
+            queues[guild_id] = []
+        title = await get_video_title(link)
+        queues[guild_id].append((title, link))
+        return f"Enqueued {title} to the queue."
 
     async def play_audio(self, link, guild_id):
         try:
@@ -82,7 +86,7 @@ class AudioPlayer:
             loop = asyncio.get_event_loop()
             data = await asyncio.gather(loop.run_in_executor(None, lambda: ytdl.extract_info(link, download=False)))
             song = data[0]['url']
-            player_task = loop.create_task(self.play_audio_task(voice_client, song))
+            player_task = loop.create_task(self.play_audio_task(voice_client, song, guild_id))
             await player_task
         except KeyError:
             return "Unable to find audio URL."
@@ -96,19 +100,20 @@ class AudioPlayer:
 
         return "Audio playback started."
     
-    async def play_audio_task(self, voice_client, song):
+    async def play_audio_task(self, voice_client, song, guild_id):
         try:
             player = discord.FFmpegPCMAudio(song, **ffmpeg_options)
-            voice_client.play(player)
+            voice_client.play(player, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(guild_id), client.loop))
         except Exception as e:
-            print(e)
+            print(f"Error playing audio: {e}")
             raise RuntimeError(f"Error playing audio: {e}")
 
-    async def stop_audio(self, guild_id):
-        if guild_id in self.voice_clients:
-            voice_client = self.voice_clients[guild_id]
-            await voice_client.disconnect()
-            del self.voice_clients[guild_id]
+    async def play_next(self, guild_id):
+        if guild_id in queues and queues[guild_id]:
+            link = queues[guild_id].pop(0)
+            await self.play_audio(link, guild_id)
+        else:
+            return "The queue is empty."
 
 audio_player = AudioPlayer()
 
@@ -156,6 +161,7 @@ async def on_message(message: Message) -> None:
     username: str = str(message.author)
     user_message: str = message.content
     channel: str = str(message.channel)
+    guild_id = message.guild.id
 
     print(f'[{channel}] {username}: "{user_message}"')
 
@@ -181,8 +187,8 @@ async def on_message(message: Message) -> None:
             "?pause": "pause audio playback",
             "?resume": "resume audio playback",
             "?stop": "stop audio playback",
-            "?loop": "loop audio playback",
-            "?endloop": "stop looping audio playback",
+            "?queue": "enqueue links for audio playback",
+            "?viewqueue": "view queued links",
 
             "dice": "Rolls a 6-sided dice.",
             "coin": "Flips a 2-sided coin.",
@@ -244,6 +250,27 @@ async def on_message(message: Message) -> None:
             await audio_player.stop_audio(message.guild.id)
         else:
             await message.channel.send("Please join a voice channel to use this command.")
+
+    elif user_message.startswith('?queue'):
+        if message.author.voice and message.author.voice.channel:
+            split_message = user_message.split()
+            if len(split_message) > 1:
+                link_to_queue = split_message[1]
+                enqueue_message = await audio_player.enqueue(link_to_queue, guild_id)
+                await message.channel.send(enqueue_message)
+            else:
+                await message.channel.send("Please provide a valid URL to enqueue.")
+        else:
+            await message.channel.send("Please join a voice channel to use this command.")
+
+    elif user_message.startswith('?viewqueue'):
+        guild_id = message.guild.id
+        queue = queues.get(guild_id, [])
+        if queue:
+            queue_message = "Current queue:\n" + "\n".join([f"**{title}**\n<{link}>" for title, link in queue])
+        else:
+            queue_message = "The queue is currently empty."
+        await message.channel.send(queue_message)
 
     # Reminder
     elif user_message.startswith('?remind'):
