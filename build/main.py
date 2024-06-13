@@ -225,17 +225,9 @@ async def on_message(message: Message) -> None:
         else:
             await message.channel.send("Please join a voice channel to use this command.")
 
-    elif user_message.startswith('?loop'):
-        link_to_play = user_message.split()[1]
-        guild_id = message.guild.id
-        await audio_player.start_loop(link_to_play, guild_id)
-
-    elif user_message.startswith('?endloop'):
-        await audio_player.stop_loop()
-
     elif user_message.startswith('?pause'):
         if message.author.voice and message.author.voice.channel:
-            await audio_player.pause_audio(message.guild.id)
+            await audio_player.pause_audio(message.guild.id)                                                                                                                                                                                                                                                                                
         else:
             await message.channel.send("Please join a voice channel to use this command.")
 
@@ -271,7 +263,7 @@ async def on_message(message: Message) -> None:
         else:
             queue_message = "The queue is currently empty."
         await message.channel.send(queue_message)
-
+    
     # Reminder
     elif user_message.startswith('?remind'):
         reminder_text = ' '.join(user_message.split()[1:])
