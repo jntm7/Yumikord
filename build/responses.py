@@ -491,6 +491,22 @@ def play_guesser(user_id, guess):
 
     return response
 
+# Trivia
+
+def get_trivia_question():
+    response = requests.get("https://opentdb.com/api.php?amount=1&type=multiple")
+    data = response.json()
+    if data['response_code'] == 0:
+        question_data = data['results'][0]
+        question = question_data['question']
+        correct_answer = question_data['correct_answer']
+        incorrect_answers = question_data['incorrect_answers']
+        all_answers = incorrect_answers + [correct_answer]
+        random.shuffle(all_answers)
+        return question, correct_answer, all_answers
+    else:
+        return None, None, None
+
 # Response to an unsupported message
 def choose_random_response(user_input: str) -> str:
     responses: Final[str] = [
@@ -692,5 +708,14 @@ def get_response(user_input: str, user_id: str = None) -> str:
         guess = lowered.split('guess.', 1)[1].strip()
         return play_guesser(user_id, guess)
 
+    # Trivia
+    elif lowered == 'play.trivia':
+        question, correct_answer, all_answers = get_trivia_question()
+        if question:
+            answer_text = '\n'.join([f"{i+1}. {answer}" for i, answer in enumerate(all_answers)])
+            return f"Trivia Question:\n{question}\n\nAnswers:\n{answer_text}\n\nReply with the correct answer number!"
+        else:
+            return "Couldn't retrieve any trivia question right now. Please try again later."
+        
     else:
         return choose_random_response(user_input)
