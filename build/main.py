@@ -61,6 +61,7 @@ class AudioPlayer:
         self.link_to_play = ""
         self.guild_id = None
         self.voice_clients = {}
+        self.text_channels = {}
 
     async def enqueue(self, link, guild_id):
         if guild_id not in queues:
@@ -69,7 +70,7 @@ class AudioPlayer:
         queues[guild_id].append((title, link))
         return f"Enqueued {title} to the queue."
 
-    async def play_audio(self, link, guild_id):
+    async def play_audio(self, link, guild_id, text_channel):
         try:
             if guild_id in self.voice_clients:
                 voice_client = self.voice_clients[guild_id]
@@ -78,6 +79,9 @@ class AudioPlayer:
                 self.voice_clients[guild_id] = voice_client
             else:
                 return "Guild not found."
+
+            # Save the text channel to send messages to
+            self.text_channels[guild_id] = text_channel
         except Exception as e:
             print(e)
             return f"Error connecting to voice channel: {e}"
@@ -85,8 +89,10 @@ class AudioPlayer:
         try:
             loop = asyncio.get_event_loop()
             data = await asyncio.gather(loop.run_in_executor(None, lambda: ytdl.extract_info(link, download=False)))
-            song = data[0]['url']
-            player_task = loop.create_task(self.play_audio_task(voice_client, song, guild_id))
+            song_info = data[0]
+            song_url = song_info['url']
+            song_title = song_info.get('title', 'Unknown Title')
+            player_task = loop.create_task(self.play_audio_task(voice_client, song_url, guild_id, song_title))
             await player_task
         except KeyError:
             return "Unable to find audio URL."
@@ -99,21 +105,38 @@ class AudioPlayer:
             return f"Error playing audio: {e}"
 
         return "Audio playback started."
-    
-    async def play_audio_task(self, voice_client, song, guild_id):
+
+    async def play_audio_task(self, voice_client, song, guild_id, song_title):
         try:
             player = discord.FFmpegPCMAudio(song, **ffmpeg_options)
             voice_client.play(player, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(guild_id), client.loop))
+            await self.send_now_playing_message(guild_id, song_title)
         except Exception as e:
             print(f"Error playing audio: {e}")
             raise RuntimeError(f"Error playing audio: {e}")
 
+    async def send_now_playing_message(self, guild_id, song_title):
+        if guild_id in self.text_channels:
+            text_channel = self.text_channels[guild_id]
+            await text_channel.send(f"Now Playing: {song_title}")
+
     async def play_next(self, guild_id):
         if guild_id in queues and queues[guild_id]:
-            link = queues[guild_id].pop(0)
-            await self.play_audio(link, guild_id)
+            title, link = queues[guild_id].pop(0)
+            await self.play_audio(link, guild_id, self.text_channels[guild_id])
         else:
             return "The queue is empty."
+
+    async def stop_audio(self, guild_id):
+        if guild_id in self.voice_clients:
+            voice_client = self.voice_clients[guild_id]
+            if voice_client.is_playing():
+                voice_client.stop()
+                return "Audio playback stopped."
+            else:
+                return "No audio is currently playing."
+        else:
+            return "Not connected to a voice channel."
 
 audio_player = AudioPlayer()
 
@@ -219,7 +242,7 @@ async def on_message(message: Message) -> None:
             if len(split_message) > 1:
                 link_to_play = split_message[1]
                 guild_id = message.guild.id
-                await audio_player.play_audio(link_to_play, guild_id)
+                await audio_player.play_audio(link_to_play, guild_id, message.channel)
             else:
                 await message.channel.send("Please provide a valid URL to play.")
         else:
@@ -227,7 +250,7 @@ async def on_message(message: Message) -> None:
 
     elif user_message.startswith('?pause'):
         if message.author.voice and message.author.voice.channel:
-            await audio_player.pause_audio(message.guild.id)                                                                                                                                                                                                                                                                                
+            await audio_player.pause_audio(message.guild.id)
         else:
             await message.channel.send("Please join a voice channel to use this command.")
 
@@ -239,7 +262,8 @@ async def on_message(message: Message) -> None:
 
     elif user_message.startswith('?stop'):
         if message.author.voice and message.author.voice.channel:
-            await audio_player.stop_audio(message.guild.id)
+            response = await audio_player.stop_audio(message.guild.id)
+            await message.channel.send(response)
         else:
             await message.channel.send("Please join a voice channel to use this command.")
 
@@ -259,7 +283,7 @@ async def on_message(message: Message) -> None:
         guild_id = message.guild.id
         queue = queues.get(guild_id, [])
         if queue:
-            queue_message = "Current queue:\n" + "\n".join([f"**{title}**\n<{link}>" for title, link in queue])
+            queue_message = "Current queue:\n" + "\n" + "\n".join([f"**{title}**\n<{link}>" for title, link in queue])
         else:
             queue_message = "The queue is currently empty."
         await message.channel.send(queue_message)
