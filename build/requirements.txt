@@ -4,4 +4,3 @@ googletrans==4.0.0-rcl
 discord==2.3.2
 asyncio==3.4.3
 yt-dlp==2024.5.27
-maturin==1.6.0  
