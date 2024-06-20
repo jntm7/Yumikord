@@ -294,7 +294,9 @@ async def on_message(message: Message) -> None:
         guild_id = message.guild.id
         queue = queues.get(guild_id, [])
         if queue:
-            queue_message = "Current queue:\n" + "\n" + "\n".join([f"**{title}**\n<{link}>" for title, link in queue])
+            queue_message = "Current queue:\n"
+            for i, (title, link) in enumerate(queue, start=1):
+                queue_message += f"{i}. **{title.ljust(15)}** [<{link}>]\n"
         else:
             queue_message = "The queue is currently empty."
         await message.channel.send(queue_message)
@@ -307,7 +309,7 @@ async def on_message(message: Message) -> None:
             await message.channel.send("Invalid reminder format. Please use: ?remind <time> <unit> <message>")
         else:
             await schedule_reminder(delay, str(message.author.id), str(message.channel.id), reminder_message)
-            await message.channel.send(f"Reminder set for {delay} seconds: {reminder_message}. I'll notify you when the time is up.")
+            await message.channel.send(f"Reminder set for {delay} seconds: {reminder_message}.\nI'll notify you when the time is up.")
 
     # Emoji Translate
     elif user_message.startswith("?emoji"):

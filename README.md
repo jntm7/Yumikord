@@ -242,16 +242,16 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 ### 🗣️ Translator
 
 - ```translate apple en fr```             
-- ```translate ありがとう jp es```         
+- ```translate ありがとう ja es```         
 - ```translate krapfen de zh-CN```        
 
 ### 🔉 Audio Playback
 
 - ```?play https://youtu.be/dQw4w9WgXcQ```
-- ```?queue https://soundcloud.com/centralcee-music/obsessed-with-you```
+- ```?queue https://soundcloud.com/musiclinkhere```
 
 ### 🔴 Pokémon Information
 
 - ```pokemon.pikachu```        
 - ```pokemon.bulbasaur```      
-- ```pokemon.charizard```      
+- ```pokemon.charizard```     
