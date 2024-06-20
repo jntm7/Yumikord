@@ -156,10 +156,13 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
     - generates a random number within the specified range
 - `play.rps`
     - play a game of rock-paper-scissors
-    - input your choice of `<rock>` , `<paper>`, or `<scissors>`
+    - input your choice of `<rock>`, `<paper>`, or `<scissors>`
 - `play.guess`
     - play a game of number guessing
     - input your guess using `guess.<number>`
+- `play.trivia`
+    - play a game of trivia
+    - input your selected answer using `play.trivia <number>`
 
 ### 🎉 Fun
 
@@ -248,7 +251,7 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 ### 🔉 Audio Playback
 
 - ```?play https://youtu.be/dQw4w9WgXcQ```
-- ```?queue https://soundcloud.com/musiclinkhere```
+- ```?queue https://soundcloud.com/centralcee-music/obsessed-with-you```
 
 ### 🔴 Pokémon Information
 
