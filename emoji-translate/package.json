@@ -1,0 +1,14 @@
+{
+    "name": "emoji-translate",
+    "version": "1.0.0",
+    "description": "Translate text to emojis",
+    "main": "emoji.js",
+    "dependencies": {
+        "moji-translate": "^1.0.8"
+    },
+    "scripts": {
+        "start": "node emoji.js"
+    },
+    "author": "Your Name",
+    "license": "MIT"
+}

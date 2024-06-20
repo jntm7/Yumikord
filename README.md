@@ -36,7 +36,9 @@ Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 
 **Clone this repository** with your preferred version control platform (e.g. GitHub Desktop), or simply **download [build](build)** and place it to your preferred directory.
 
-Ensure that you have Python installed. You can download it from the [**Python official website**](https://www.python.org/downloads/). During installation, check the option to `add Python to system PATH`.
+Ensure that you have Python installed. You can download it from the [**Python official website**](https://python.org/downloads/). During installation, check the option to `add Python to system PATH`.
+
+Ensure that you have Node.js installed. You can download it from the [**Node.js official website**](https://nodejs.org/en) and NPM (which comes with Node.js)
 
 ### 🔨 Step 5:
 
