@@ -1,0 +1,16 @@
+{
+  "name": "yumikord",
+  "version": "1.0.0",
+  "description": "![image](https://github.com/jntm7/Yumikord/assets/108718802/349a4bbf-e7fd-443b-9c65-b07761743934)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "moji-translate": "^1.0.8",
+    "open-trivia-db": "^2.1.6"
+  }
+}
