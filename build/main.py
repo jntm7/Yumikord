@@ -215,6 +215,7 @@ async def on_message(message: Message) -> None:
             "translate <text> <source_language> <target_language>": "Translates text from one language to another.",
             "dictionary.<word>": "Defines a word.",
             "color": "Generates a random color palette.",
+            "?emoji": "Translates text into emojis.",
             
             "?play <link>": "start audio playback from a specified link",
             "?pause": "pause audio playback",
