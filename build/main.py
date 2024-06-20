@@ -4,6 +4,7 @@ import yt_dlp
 import discord
 import signal
 import sys
+import subprocess
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
@@ -175,6 +176,15 @@ async def schedule_reminder(delay, user_id, channel_id, message):
     reminder_task = asyncio.create_task(send_reminder_delayed(delay, user_id, channel_id, message))
     reminders[reminder_task] = (user_id, channel_id, message)
 
+# Emoji Translate
+async def translate_to_emoji(text):
+    try:
+        result = subprocess.run(['node', 'emoji-translate/emoji.js', text], capture_output=True, text=True)
+        return result.stdout.strip()
+    except Exception as e:
+        print(f"Error translating to emoji: {e}")
+        return "Failed to translate to emojis."
+
 ## Message
 @client.event
 async def on_message(message: Message) -> None:
@@ -205,6 +215,7 @@ async def on_message(message: Message) -> None:
             "translate <text> <source_language> <target_language>": "Translates text from one language to another.",
             "dictionary.<word>": "Defines a word.",
             "color": "Generates a random color palette.",
+            "?emoji": "Translates text into emojis.",
             
             "?play <link>": "start audio playback from a specified link",
             "?pause": "pause audio playback",
@@ -297,6 +308,13 @@ async def on_message(message: Message) -> None:
         else:
             await schedule_reminder(delay, str(message.author.id), str(message.channel.id), reminder_message)
             await message.channel.send(f"Reminder set for {delay} seconds: {reminder_message}. I'll notify you when the time is up.")
+
+    # Emoji Translate
+    elif user_message.startswith("?emoji"):
+        text = user_message[len("?emoji "):]
+        emoji_text = await translate_to_emoji(text)
+        await message.channel.send(emoji_text)
+        return
 
     else:
         response = get_response(user_message, str(message.author.id))
