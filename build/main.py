@@ -5,10 +5,11 @@ import discord
 import signal
 import sys
 import subprocess
+from profile import initialize_profile, add_xp_and_coins_command, display_profile_command
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
-from responses import get_response, choose_random_response
+from responses import get_response
 
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
@@ -24,6 +25,22 @@ voice_clients = {}
 yt_dlp_options = {"format": "bestaudio/best"}
 ytdl = yt_dlp.YoutubeDL(yt_dlp_options)
 ffmpeg_options = {'options': '-vn -filter:a "volume=0.50"'}
+
+# Profile
+@client.command(name='profile')
+async def profile_command(ctx):
+    user_id = ctx.author.id
+    await initialize_profile(user_id, ctx.author.name)
+    await display_profile_command(user_id, ctx.channel)
+
+# Add XP and Coins Command
+XP_RATE = 5
+COIN_RATE = 10
+
+@client.command(name='addxpcoins')
+async def add_xp_coins_handler(ctx, xp_amount: int):
+    user_id = ctx.author.id
+    await add_xp_and_coins_command(user_id, xp_amount, COIN_RATE, ctx.channel)
 
 async def get_video_title(link):
     try:
