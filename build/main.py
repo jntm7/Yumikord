@@ -179,7 +179,22 @@ async def schedule_reminder(delay, user_id, channel_id, message):
 # Emoji Translate
 async def translate_to_emoji(text):
     try:
-        result = subprocess.run(['node', 'emoji-translate/emoji.js', text], capture_output=True, text=True)
+       # Get the absolute path of the project directory
+        project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Construct the path to emoji.js within the emoji-translate directory
+        script_path = os.path.join(project_dir, 'emoji-translate', 'emoji.js')
+
+        print(f"Translating text to emoji: {text}")
+        result = subprocess.run(['node', script_path, text], capture_output=True, text=True, encoding='utf-8')
+        
+        # Debugging output
+        print(f"Subprocess return code: {result.returncode}")
+        print(f"Subprocess stdout: {result.stdout}")
+        print(f"Subprocess stderr: {result.stderr}")
+
+        if result.returncode != 0:
+            raise Exception(f"Subprocess failed with return code {result.returncode}")
+
         return result.stdout.strip()
     except Exception as e:
         print(f"Error translating to emoji: {e}")
@@ -230,6 +245,8 @@ async def on_message(message: Message) -> None:
             "play.rps": "Play a game of rock-paper-scissors.",
             "play.guess": "Play a game of number guessing.",
             "guess.<number>": "Input after starting the number guessing game.",
+            "play.trivia": "Play a game of trivia.",
+            "play.trivia <number>": "Choose numbered option as answer for trivia.",
 
             "joke": "Tells a random joke.",
             "dadjoke": "Tells a random dad joke.",
@@ -312,11 +329,10 @@ async def on_message(message: Message) -> None:
             await message.channel.send(f"Reminder set for {delay} seconds: {reminder_message}.\nI'll notify you when the time is up.")
 
     # Emoji Translate
-    elif user_message.startswith("?emoji"):
-        text = user_message[len("?emoji "):]
-        emoji_text = await translate_to_emoji(text)
-        await message.channel.send(emoji_text)
-        return
+    elif user_message.startswith('?emoji'):
+        text_to_translate = user_message[len('?emoji '):]
+        translated_text = await translate_to_emoji(text_to_translate)
+        await message.channel.send(translated_text)
 
     else:
         response = get_response(user_message, str(message.author.id))

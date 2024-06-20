@@ -1,7 +1,9 @@
+import requests
 import random
+import re
+import html
 from random import choice, randint
 from typing import Final
-import requests
 from datetime import datetime, timedelta
 from fuzzywuzzy import process
 from googletrans import Translator
@@ -492,20 +494,49 @@ def play_guesser(user_id, guess):
     return response
 
 # Trivia
+class TriviaGame:
+    def __init__(self):
+        self.active_game = False
+        self.question = None
+        self.correct_answer = None
+        self.all_answers = []
+        
+    def get_trivia_question(self):
+        response = requests.get("https://opentdb.com/api.php?amount=1&type=multiple")
+        data = response.json()
+        if data['response_code'] == 0:
+            question_data = data['results'][0]
+            self.question = html.unescape(question_data['question'])
+            self.correct_answer = html.unescape(question_data['correct_answer'])
+            incorrect_answers = [html.unescape(answer) for answer in question_data['incorrect_answers']]
+            self.all_answers = incorrect_answers + [self.correct_answer]
+            random.shuffle(self.all_answers)
+            return self.question, self.all_answers
+        else:
+            return None, None
+    
+    def start_game(self):
+        if not self.active_game:
+            self.active_game = True
+            return self.get_trivia_question()
+        return None, None
+    
+    def answer_question(self, answer_index):
+        if self.active_game:
+            if 0 <= answer_index < len(self.all_answers):
+                selected_answer = self.all_answers[answer_index]
+                if selected_answer == self.correct_answer:
+                    self.active_game = False
+                    return True, "Congratulations, that is the correct answer!"
+                else:
+                    self.active_game = False
+                    return True, f"Sorry, the correct answer is: {self.correct_answer}"
+            else:
+                return False, "Please respond with a valid number."
+        else:
+            return False, "There is no active game. Please start a new game with `play.trivia`."
 
-def get_trivia_question():
-    response = requests.get("https://opentdb.com/api.php?amount=1&type=multiple")
-    data = response.json()
-    if data['response_code'] == 0:
-        question_data = data['results'][0]
-        question = question_data['question']
-        correct_answer = question_data['correct_answer']
-        incorrect_answers = question_data['incorrect_answers']
-        all_answers = incorrect_answers + [correct_answer]
-        random.shuffle(all_answers)
-        return question, correct_answer, all_answers
-    else:
-        return None, None, None
+trivia_game = TriviaGame()
 
 # Response to an unsupported message
 def choose_random_response(user_input: str) -> str:
@@ -709,13 +740,24 @@ def get_response(user_input: str, user_id: str = None) -> str:
         return play_guesser(user_id, guess)
 
     # Trivia
-    elif lowered == 'play.trivia':
-        question, correct_answer, all_answers = get_trivia_question()
-        if question:
-            answer_text = '\n'.join([f"{i+1}. {answer}" for i, answer in enumerate(all_answers)])
-            return f"Trivia Question:\n{question}\n\nAnswers:\n{answer_text}\n\nReply with the correct answer number!"
+    elif lowered.startswith("play.trivia"):
+        if not trivia_game.active_game:
+            question, options = trivia_game.start_game()
+            if question:
+                return f"[Question] {question}\n[Options]\n" + "\n".join([f"{i+1}. {answer}" for i, answer in enumerate(options)])
+            else:
+                return f"Couldn't fetch any trivia questions. Please try again later!"
         else:
-            return "Couldn't retrieve any trivia question right now. Please try again later."
-        
+            match = re.match(r"^play\.trivia\s+(\d+)$", lowered)
+            if match:
+                answer_index = int(match.group(1)) - 1
+                answered, response = trivia_game.answer_question(answer_index)
+                if answered:
+                    return response
+                else:
+                    return response
+            else:
+                return "Invalid format. Please use `play.trivia <number>` to answer the question."
+
     else:
         return choose_random_response(user_input)
