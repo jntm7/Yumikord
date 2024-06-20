@@ -163,6 +163,8 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 
 ### 🎉 Fun
 
+- `?emoji`:
+    - [Thanks to Emoji-Translate](http://meowni.ca/emoji-translate/)
 - `meme`:
     - [Thanks to MemeAPI](https://meme-api.com/)
 - `joke`:
