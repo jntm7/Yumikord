@@ -92,6 +92,11 @@ Things to note:
         - `minutes`(or `minute`, `min`, `m`)
         - `hours` (or `hour`, `hr`, `h`)
 
+### 💬 Server
+
+- `?profile`
+- `?leaderboard`
+
 ### 🔨 Tools
 
 - `calculate`: 
@@ -163,6 +168,7 @@ Thanks to [FFmpeg](https://www.ffmpeg.org) and [yt-dlp](https://github.com/yt-dl
 - `play.trivia`
     - play a game of trivia
     - input your selected answer using `play.trivia <number>`
+    - [Thanks to Open Trivia DB](https://opentdb.com)
 
 ### 🎉 Fun
 
