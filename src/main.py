@@ -5,7 +5,7 @@ import discord
 import signal
 import sys
 import subprocess
-from profile import conn, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed
+from user_profile import conn, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
