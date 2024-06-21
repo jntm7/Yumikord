@@ -4,11 +4,11 @@
 
 *Elevate your Discord community with **Yumiko** - a versatile and multifunctional bot!*
 
-## 🛠️ Installation & Setup
+## 🛠️ Setup
 
 ### 🔨 Step 1: 
 
-If you do not already have a Discord account, sign up [here](https://discord.com/register).
+Signup for a Discord account [here](https://discord.com/register).
 
 Create an application on [**Discord Developer Portal**](https://discord.com/developers/applications).
 
@@ -18,6 +18,7 @@ Create an application on [**Discord Developer Portal**](https://discord.com/deve
 ### 🔨 Step 2:
 
 Obtain your **Discord token** by:
+
 - Navigate to the `Discord Developer Portal > Settings > Bot.`
 - Under `Username`, there should be a `Reset Token` button.
 - Before resetting, scroll down to `Privileged Gateway Intents`
@@ -28,9 +29,11 @@ Obtain your **Discord token** by:
 ### 🔨 Step 3:
 
 Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
+
 - Navigate to `Discord Developer Portal > Settings > OAuth2`.
 - Under `OAuth2 URL Generator`, assign the `bot` scope.
 - Under `Bot Permissions`, assign the bot **all the text permissions**, as well as **connect, speak under voice permissions**.
+- Copy the created URL to invite the bot to your server of choice.
 
 ### 🔨 Step 4:
 
@@ -40,20 +43,20 @@ Please ensure that you have the necessary prerequisites; Python and Node.js inst
    - [Python](https://python.org/downloads/) (3.7 or higher)
    - [Node.js](https://nodejs.org/en) (includes npm)
 
+## 🛠️ Installation
+
 ### 🔨 Step 5:
 
-**Installation:**
 
 - Clone this repository or download the source code.
-
 - Navigate to the project directory in your terminal.
-
 - Install Python dependencies:
+  
     ```
     pip install -r requirements.txt
     ```
-
 - Install Node.js dependencies:
+  
     ```
     cd emoji-translate
     npm install
@@ -63,24 +66,30 @@ Please ensure that you have the necessary prerequisites; Python and Node.js inst
 ### 🔨 Step 6:
 
 - Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in Step 2.
+- Open the [.env file](build\.env) with a text editor (e.g. Notepad) and add your Discord token:
+  
+     ```
+     DISCORD_TOKEN=your_token_here
+     ```
 
-- Open the [.env file](build\.env) with a text editor (e.g. Notepad) and add your Discord token: ```DISCORD_TOKEN=your_token_here```.
-
-**Keep this token secure** and refrain from sharing it, as it will grant anyone with it unrestricted access to your bot and server.
+   **Keep this token secure** and refrain from sharing it, as it will grant anyone with it unrestricted access to your bot and server.
 
 ### 🔨 Step 7:
 
 - Run the bot:
-      ```
-      python src/main.py
-      ```
-- If successful, you'll see "YOURBOTNAME is now running!" in the terminal.
-- Your bot should appear online in your Discord server.
+  
+     ```
+     py src/main.py
+     ```
+- If successful, `"YOURBOTNAME is now running!"` will be printed in the terminal. Your bot should appear online in your Discord server.
 
 ### 🔨 Step 8:
 
 To interact with the bot:
 - Use [commands](\COMMANDS.md) in any channel where the bot is present.
-- Your messages will be displayed in the terminal as: `[channel] user: "message"`.
-
-**Note:** Keep the terminal open to keep the bot running. To stop the bot, simply close the terminal.
+- Your messages will be displayed in the terminal as:
+     ```
+     [channel] user: "message"
+     ```
+     
+   **Note:** Keep the terminal open to keep the bot running. To stop the bot, simply close the terminal.
