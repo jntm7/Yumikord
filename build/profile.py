@@ -1,8 +1,16 @@
 import sqlite3
 import discord
+from typing import Tuple, List
 
+# Database Connection
 conn = sqlite3.connect('user_profiles.db')
 cursor = conn.cursor()
+
+def get_database_connection():
+    return conn
+
+def get_cursor():
+    return cursor
 
 # Create Profile
 cursor.execute('''
@@ -34,6 +42,10 @@ async def get_user_profile(user_id):
             'coins': result[4]
         }
     return None
+
+# Calculate XP
+def calculate_xp_for_next_level(current_level: int) -> int:
+    return 100 * (current_level + 1)
 
 # Add XP & Coins
 async def add_xp_and_coins(user_id, xp_amount, coin_amount):
@@ -75,3 +87,38 @@ async def display_profile(user_id, channel, client):
             await channel.send("User profile not found.")
         else:
             print(f"Error: Expected discord.TextChannel, got {type(channel)}")
+
+# Leaderboard
+async def get_leaderboard(guild: discord.Guild) -> List[Tuple[str, int, int, int]]:
+    cursor = get_cursor()
+    cursor.execute("""
+        SELECT user_id, username, level, xp
+        FROM user_profiles
+        ORDER BY level DESC, xp DESC
+        LIMIT 10
+    """)
+    leaderboard_data = cursor.fetchall()
+    
+    # Filter out users who are not in the guild
+    guild_member_ids = [member.id for member in guild.members]
+    filtered_leaderboard = [
+        (username, level, xp, user_id) 
+        for user_id, username, level, xp in leaderboard_data 
+        if int(user_id) in guild_member_ids
+    ]
+    return filtered_leaderboard
+
+# Display Leaderboard
+def display_leaderboard_embed(leaderboard_data: List[Tuple[str, int, int, int]]) -> discord.Embed:
+    embed = discord.Embed(title="🏆 Leaderboard", color=0xFFD700)
+    
+    for i, (username, level, xp, user_id) in enumerate(leaderboard_data, start=1):
+        xp_to_next_level = calculate_xp_for_next_level(level)
+        progress = f"{xp}/{xp_to_next_level}"
+        embed.add_field(
+            name=f"{i}. {username}",
+            value=f"Level: {level} | XP: {progress}",
+            inline=False
+        )
+    
+    return embed

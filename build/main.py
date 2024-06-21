@@ -5,7 +5,7 @@ import discord
 import signal
 import sys
 import subprocess
-from profile import initialize_profile, add_xp_and_coins, display_profile
+from profile import conn, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
@@ -230,9 +230,23 @@ async def on_message(message: Message) -> None:
         channel = message.channel
         await display_profile(message.author.id, channel, client)
 
+    # Leaderboard
+    elif user_message.startswith('?leaderboard'):
+        guild = message.guild
+        leaderboard_data = await get_leaderboard(guild)
+    
+        if leaderboard_data:
+            leaderboard_embed = display_leaderboard_embed(leaderboard_data)
+            await message.channel.send(embed=leaderboard_embed)
+        else:
+            await message.channel.send("No leaderboard data available.")
+
     # Help
     elif user_message.startswith('?help'):
         commands = {
+            "?profile": "Displays user server profile (Level, XP, Coins)",
+            "?leaderboard": "Displays the top 10 highest levelled users in the server.",
+
             "?remind <time> <unit> <message>": "Set a reminder after a specified time with a message.",
             "calculate <expression>": "Calculates the given mathematical expression.",
             "convert <value> <from_unit> <to_unit>": "Converts a value from one unit to another.",
@@ -371,6 +385,7 @@ async def send_message(message: Message, user_message: str) -> None:
 # Disconnect
 def signal_handler(sig, frame):
     print("Shutting down...")
+    conn.close()
     async def close_client():
         for vc in client.voice_clients:
             await vc.disconnect()
