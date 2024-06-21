@@ -6,7 +6,7 @@
 
 ## 🛠️ Setup
 
-### 🔨 Step 1: 
+### 🔨 Step 1: Creating a Discord Application
 
 Signup for a Discord account [here](https://discord.com/register).
 
@@ -15,7 +15,7 @@ Create an application on [**Discord Developer Portal**](https://discord.com/deve
 - Under `Discord Developer Portal > Applications`, click `New Application`and assign a `Name`.
 - Under `Discord Developer Portal > Settings > General Information`, assign a `Description`, and `App Icon` for your application.
 
-### 🔨 Step 2:
+### 🔨 Step 2: Creating a Discord Token
 
 Obtain your **Discord token** by:
 
@@ -26,7 +26,7 @@ Obtain your **Discord token** by:
 - Click `Reset Token` and complete 2FA if it is enabled on your Discord account.
 - Copy your Discord token that will be needed in Step 6. 
 
-### 🔨 Step 3:
+### 🔨 Step 3: Assigning Bot Permissions
 
 Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 
@@ -35,9 +35,9 @@ Invite your bot to desired Discord server using the **OAuth2 URL Generator**:
 - Under `Bot Permissions`, assign the bot **all the text permissions**, as well as **connect, speak under voice permissions**.
 - Copy the created URL to invite the bot to your server of choice.
 
-### 🔨 Step 4:
+### 🔨 Step 4: Installing Prerequisites
 
-Please ensure that you have the necessary prerequisites; Python and Node.js installed.
+Please ensure that you have Python and Node.js installed.
 
 **Prerequisites:**
    - [Python](https://python.org/downloads/) (3.7 or higher)
@@ -45,7 +45,7 @@ Please ensure that you have the necessary prerequisites; Python and Node.js inst
 
 ## 🛠️ Installation
 
-### 🔨 Step 5:
+### 🔨 Step 5: Clone / Download the Project
 
 
 - Clone this repository or download the source code.
@@ -63,7 +63,7 @@ Please ensure that you have the necessary prerequisites; Python and Node.js inst
     cd ..
     ```
 
-### 🔨 Step 6:
+### 🔨 Step 6: Placing the Discord Token
 
 - Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in Step 2.
 - Open the [.env file](build\.env) with a text editor (e.g. Notepad) and add your Discord token:
@@ -74,16 +74,16 @@ Please ensure that you have the necessary prerequisites; Python and Node.js inst
 
    **Keep this token secure** and refrain from sharing it, as it will grant anyone with it unrestricted access to your bot and server.
 
-### 🔨 Step 7:
+### 🔨 Step 7: Running the Application
 
-- Run the bot:
+- Run the bot by using:
   
      ```
      py src/main.py
      ```
 - If successful, `"YOURBOTNAME is now running!"` will be printed in the terminal. Your bot should appear online in your Discord server.
 
-### 🔨 Step 8:
+### 🔨 Step 8: Running Commands
 
 To interact with the bot:
 - Use [commands](\COMMANDS.md) in any channel where the bot is present.
