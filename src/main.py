@@ -11,15 +11,21 @@ from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
 from responses import get_response
 
-load_dotenv()
+# Load Token
+current_dir = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(current_dir, '..', 'build', '.env')
+
+load_dotenv(dotenv_path)
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 print(TOKEN)
 
+# Intents
 intents: Intents = Intents.default()
 intents.message_content = True
 intents.messages = True
 client: Client = Client(intents=intents)
 
+# YT-DLP & FFMPEG Settings
 queues = {}
 voice_clients = {}
 yt_dlp_options = {"format": "bestaudio/best"}
