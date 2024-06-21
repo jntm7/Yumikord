@@ -26,7 +26,7 @@ Obtain your **Discord token** by:
 - Before resetting, scroll down to `Privileged Gateway Intents`
 - Assign the bot `MESSAGE CONTENT INTENT` (and `SERVER MEMBERS INTENT` if you choose to).
 - Click `Reset Token` and complete 2FA if it is enabled on your Discord account.
-- Copy your Discord token that will be needed in [Step 6](https://github.com/jntm7/Yumikord/main/README.md#%EF%B8%8F-step-6-assigning-the-discord-token). 
+- Copy your Discord token that will be needed in [Step 6](#%EF%B8%8F-step-6-assigning-the-discord-token). 
 
 ### 🔨 Step 3: Assigning Bot Permissions
 
@@ -67,7 +67,7 @@ Please ensure that you have Python and Node.js installed.
 
 ### ⚙️ Step 6: Assigning the Discord Token
 
-- Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in [Step 2](https://github.com/jntm7/Yumikord/main/README.md#-step-2-creating-a-discord-token).
+- Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in [Step 2](#-step-2-creating-a-discord-token).
 - Open the [.env file](build\.env) with a text editor (e.g. Notepad) and add your Discord token:
   
      ```
