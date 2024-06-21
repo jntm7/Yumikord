@@ -47,7 +47,7 @@ Please ensure that you have Python and Node.js installed.
 
 ## 🛠️ Installation
 
-### 🔨 Step 5: Clone / Download the Project
+### ⚙️ Step 5: Clone / Download the Project
 
 
 - Clone this repository or [download the source code](https://github.com/jntm7/Yumikord/archive/refs/heads/main.zip).
@@ -65,7 +65,7 @@ Please ensure that you have Python and Node.js installed.
     cd ..
     ```
 
-### 🔨 Step 6: Assigning the Discord Token
+### ⚙️ Step 6: Assigning the Discord Token
 
 - Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in [Step 2](#Step-2).
 - Open the [.env file](build\.env) with a text editor (e.g. Notepad) and add your Discord token:
@@ -76,7 +76,7 @@ Please ensure that you have Python and Node.js installed.
 
    **Keep this token secure** and refrain from sharing it, as it will grant anyone with it unrestricted access to your bot and server.
 
-### 🔨 Step 7: Running the Application
+### ⚙️ Step 7: Running the Application
 
 - Run the bot by using:
   
@@ -85,7 +85,7 @@ Please ensure that you have Python and Node.js installed.
      ```
 - If successful, `"YOURBOTNAME is now running!"` will be printed in the terminal. Your bot should appear online in your Discord server.
 
-### 🔨 Step 8: Running Commands
+### ⚙️ Step 8: Running Commands
 
 To interact with the bot:
 - Use [commands](\COMMANDS.md) in any channel where the bot is present.
