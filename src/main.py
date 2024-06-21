@@ -5,10 +5,11 @@ import discord
 import signal
 import sys
 import subprocess
+from profile import conn, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
-from responses import get_response, choose_random_response
+from responses import get_response
 
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
@@ -25,6 +26,19 @@ yt_dlp_options = {"format": "bestaudio/best"}
 ytdl = yt_dlp.YoutubeDL(yt_dlp_options)
 ffmpeg_options = {'options': '-vn -filter:a "volume=0.50"'}
 
+# Initiate
+@client.event
+async def on_ready() -> None:
+    print(f'{client.user} is now running!')
+
+# XP & Coin Rate
+XP_RATE = 5
+COIN_RATE = 10
+async def award_xp_and_coins(user_id, username):
+    await initialize_profile(user_id, username)
+    await add_xp_and_coins(user_id, XP_RATE, COIN_RATE)
+
+# Video Title
 async def get_video_title(link):
     try:
         info = await asyncio.get_event_loop().run_in_executor(None, lambda: ytdl.extract_info(link, download=False))
@@ -33,16 +47,11 @@ async def get_video_title(link):
         print(f"Error getting video title: {e}")
         return 'Unknown Title'
 
-# Initiate
-@client.event
-async def on_ready() -> None:
-    print(f'{client.user} is now running!')
-
 # Help
 async def send_help_embed(channel, commands):
     max_fields = 25
     embeds = []
-    embed = Embed(title="Help", description="Here are the commands you can use:", color=0x00ff00)
+    embed = Embed(title="Help", description="Here are the commands you can use:", color=0x33B0FF)
 
     for i, (command, description) in enumerate(commands.items()):
         embed.add_field(name=command, value=description, inline=False)
@@ -200,7 +209,8 @@ async def translate_to_emoji(text):
         print(f"Error translating to emoji: {e}")
         return "Failed to translate to emojis."
 
-## Message
+
+# Message
 @client.event
 async def on_message(message: Message) -> None:
     if message.author == client.user:
@@ -213,9 +223,30 @@ async def on_message(message: Message) -> None:
 
     print(f'[{channel}] {username}: "{user_message}"')
 
+    await award_xp_and_coins(message.author.id, username)
+
+    # Profile
+    if user_message.startswith('?profile'):
+        channel = message.channel
+        await display_profile(message.author.id, channel, client)
+
+    # Leaderboard
+    elif user_message.startswith('?leaderboard'):
+        guild = message.guild
+        leaderboard_data = await get_leaderboard(guild)
+    
+        if leaderboard_data:
+            leaderboard_embed = display_leaderboard_embed(leaderboard_data)
+            await message.channel.send(embed=leaderboard_embed)
+        else:
+            await message.channel.send("No leaderboard data available.")
+
     # Help
-    if user_message.startswith('?help'):
+    elif user_message.startswith('?help'):
         commands = {
+            "?profile": "Displays user server profile (Level, XP, Coins)",
+            "?leaderboard": "Displays the top 10 highest levelled users in the server.",
+
             "?remind <time> <unit> <message>": "Set a reminder after a specified time with a message.",
             "calculate <expression>": "Calculates the given mathematical expression.",
             "convert <value> <from_unit> <to_unit>": "Converts a value from one unit to another.",
@@ -264,7 +295,7 @@ async def on_message(message: Message) -> None:
         await send_help_embed(message.channel, commands)
 
     # Audio Commands
-    if user_message.startswith('?play'):
+    elif user_message.startswith('?play'):
         if message.author.voice and message.author.voice.channel:
             split_message = user_message.split()
             if len(split_message) > 1:
@@ -354,6 +385,7 @@ async def send_message(message: Message, user_message: str) -> None:
 # Disconnect
 def signal_handler(sig, frame):
     print("Shutting down...")
+    conn.close()
     async def close_client():
         for vc in client.voice_clients:
             await vc.disconnect()

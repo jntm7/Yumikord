@@ -4,6 +4,7 @@ __pycache__/
 *.log
 venv/
 *.swp
+*.db
 
 # Node.js
 node_modules/
