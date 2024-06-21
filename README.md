@@ -4,6 +4,8 @@
 
 *Elevate your Discord community with **Yumiko** - a versatile and multifunctional bot!*
 
+Created as a passion project, feel free to give this a star, clone the repo and contribute!
+
 ## 🛠️ Setup
 
 ### 🔨 Step 1: Creating a Discord Application
