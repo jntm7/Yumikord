@@ -1,5 +1,6 @@
 import sqlite3
 import discord
+import random
 from typing import Tuple, List
 
 # Database Connection
@@ -122,3 +123,87 @@ def display_leaderboard_embed(leaderboard_data: List[Tuple[str, int, int, int]])
         )
     
     return embed
+
+# Bets
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS bets (
+        bet_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        bet_amount INTEGER,
+        outcome INTEGER,
+        is_settled BOOLEAN DEFAULT 0
+    )
+''')
+
+# Lottery
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS lottery_entries (
+        entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        entry_amount INTEGER,
+        entry_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+''')
+conn.commit()
+
+# Bet
+async def place_bet(user_id, bet_amount, bet_on):
+    user_profile = await get_user_profile(user_id)
+    
+    if user_profile and user_profile['coins'] >= bet_amount:
+
+        cursor.execute('UPDATE user_profiles SET coins = coins - ? WHERE user_id = ?', (bet_amount, user_id))
+        conn.commit()
+        
+        outcome = 1 if random.random() < 0.5 else 0
+        
+        cursor.execute('INSERT INTO bets (user_id, bet_amount, outcome) VALUES (?, ?, ?)', (user_id, bet_amount, outcome))
+        conn.commit()
+        
+        if outcome == 1:
+
+            winnings = bet_amount * 2
+            cursor.execute('UPDATE user_profiles SET coins = coins + ? WHERE user_id = ?', (winnings, user_id))
+            conn.commit()
+            return f"You won! You have gained {winnings} coins."
+        else:
+            return f"You lost! Better luck next time."
+    else:
+        return "You don't have enough coins to place this bet."
+
+# Lottery
+async def enter_lottery(user_id, entry_amount):
+    user_profile = await get_user_profile(user_id)
+    
+    if user_profile and user_profile['coins'] >= entry_amount:
+
+        cursor.execute('UPDATE user_profiles SET coins = coins - ? WHERE user_id = ?', (entry_amount, user_id))
+        conn.commit()
+        
+        cursor.execute('INSERT INTO lottery_entries (user_id, entry_amount) VALUES (?, ?)', (user_id, entry_amount))
+        conn.commit()
+        
+        return f"You have successfully entered the lottery with {entry_amount} coins."
+    else:
+        return "You don't have enough coins to enter the lottery."
+    
+# Lottery Result
+async def draw_lottery():
+
+    cursor.execute('SELECT entry_id, user_id, entry_amount FROM lottery_entries')
+    entries = cursor.fetchall()
+    
+    if not entries:
+        return "No entries in the lottery."
+    
+    winner_entry = random.choice(entries)
+    winner_id = winner_entry[1]
+    total_pot = sum(entry[2] for entry in entries)
+    
+    cursor.execute('UPDATE user_profiles SET coins = coins + ? WHERE user_id = ?', (total_pot, winner_id))
+    conn.commit()
+    
+    cursor.execute('DELETE FROM lottery_entries')
+    conn.commit()
+    
+    return f"Congratulations <@{winner_id}>! You have won the lottery with a total of {total_pot} coins!"
