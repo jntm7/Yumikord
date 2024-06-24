@@ -5,7 +5,7 @@ import discord
 import signal
 import sys
 import subprocess
-from user_profile import conn, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery
+from user_profile import get_database_connection, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
@@ -419,6 +419,7 @@ async def send_message(message: Message, user_message: str) -> None:
 # Disconnect
 def signal_handler(sig, frame):
     print("Shutting down...")
+    conn = get_database_connection()
     conn.close()
     async def close_client():
         for vc in client.voice_clients:
