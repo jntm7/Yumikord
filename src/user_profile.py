@@ -1,39 +1,53 @@
 import sqlite3
 import discord
+import os
+import logging
 import random
-from typing import Tuple, List
 
 # Database Connection
-conn = sqlite3.connect('user_profiles.db')
-cursor = conn.cursor()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(BASE_DIR, "user_profiles.db")
+global_conn = None
+
+def initialize_global_connection():
+    global global_conn
+    try:
+        global_conn = sqlite3.connect(db_path)
+    except sqlite3.Error as e:
+        logging.error(f"Database connection error: {e}")
+        raise
 
 def get_database_connection():
-    return conn
+    if global_conn is None:
+        initialize_global_connection()
+    return global_conn
 
-def get_cursor():
-    return cursor
+async def create_profile_table():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_profiles (
+            user_id INTEGER PRIMARY KEY,
+            username TEXT,
+            xp INTEGER DEFAULT 0,
+            level INTEGER DEFAULT 1,
+            coins INTEGER DEFAULT 0
+        )
+    ''')
+    conn.commit()
 
-# Create Profile
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS user_profiles (
-        user_id INTEGER PRIMARY KEY,
-        username TEXT,
-        xp INTEGER DEFAULT 0,
-        level INTEGER DEFAULT 1,
-        coins INTEGER DEFAULT 0
-    )
-''')
-conn.commit()
-
-# Initialize
 async def initialize_profile(user_id, username):
+    conn = get_database_connection()
+    cursor = conn.cursor()
     cursor.execute('INSERT OR IGNORE INTO user_profiles (user_id, username) VALUES (?, ?)', (user_id, username))
     conn.commit()
 
 async def get_user_profile(user_id):
+    conn = get_database_connection()
+    cursor = conn.cursor()
     cursor.execute('SELECT * FROM user_profiles WHERE user_id = ?', (user_id,))
     result = cursor.fetchone()
-    
+
     if result:
         return {
             'user_id': result[0],
@@ -44,12 +58,9 @@ async def get_user_profile(user_id):
         }
     return None
 
-# Calculate XP
-def calculate_xp_for_next_level(current_level: int) -> int:
-    return 100 * (current_level + 1)
-
-# Add XP & Coins
 async def add_xp_and_coins(user_id, xp_amount, coin_amount):
+    conn = get_database_connection()
+    cursor = conn.cursor()
     cursor.execute('SELECT xp, level FROM user_profiles WHERE user_id = ?', (user_id,))
     result = cursor.fetchone()
 
@@ -66,7 +77,6 @@ async def add_xp_and_coins(user_id, xp_amount, coin_amount):
         ''', (remaining_xp, new_level, coin_amount, user_id))
         conn.commit()
 
-# Display Profile
 async def display_profile(user_id, channel, client):
     profile = await get_user_profile(user_id)
     if profile:
@@ -89,69 +99,39 @@ async def display_profile(user_id, channel, client):
         else:
             print(f"Error: Expected discord.TextChannel, got {type(channel)}")
 
-# Leaderboard
-async def get_leaderboard(guild: discord.Guild) -> List[Tuple[str, int, int, int]]:
-    cursor = get_cursor()
-    cursor.execute("""
-        SELECT user_id, username, level, xp
-        FROM user_profiles
-        ORDER BY level DESC, xp DESC
-        LIMIT 10
-    """)
-    leaderboard_data = cursor.fetchall()
-    
-    # Filter out users who are not in the guild
-    guild_member_ids = [member.id for member in guild.members]
-    filtered_leaderboard = [
-        (username, level, xp, user_id) 
-        for user_id, username, level, xp in leaderboard_data 
-        if int(user_id) in guild_member_ids
-    ]
-    return filtered_leaderboard
-
-# Display Leaderboard
-def display_leaderboard_embed(leaderboard_data: List[Tuple[str, int, int, int]]) -> discord.Embed:
-    embed = discord.Embed(title="🏆 Leaderboard", color=0xFFD700)
-    
-    for i, (username, level, xp, user_id) in enumerate(leaderboard_data, start=1):
-        xp_to_next_level = calculate_xp_for_next_level(level)
-        progress = f"{xp}/{xp_to_next_level}"
-        embed.add_field(
-            name=f"{i}. {username}",
-            value=f"Level: {level} | XP: {progress}",
-            inline=False
+async def create_bets_table():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS bets (
+            bet_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            bet_amount INTEGER,
+            outcome INTEGER,
+            is_settled BOOLEAN DEFAULT 0
         )
-    
-    return embed
+    ''')
+    conn.commit()
 
-# Bets
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS bets (
-        bet_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        bet_amount INTEGER,
-        outcome INTEGER,
-        is_settled BOOLEAN DEFAULT 0
-    )
-''')
+async def create_lottery_entries_table():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lottery_entries (
+            entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            entry_amount INTEGER,
+            entry_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
 
-# Lottery
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS lottery_entries (
-        entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        entry_amount INTEGER,
-        entry_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-''')
-conn.commit()
-
-# Bet
 async def place_bet(user_id, bet_amount, bet_on):
+    conn = get_database_connection()
+    cursor = conn.cursor()
     user_profile = await get_user_profile(user_id)
     
     if user_profile and user_profile['coins'] >= bet_amount:
-
         cursor.execute('UPDATE user_profiles SET coins = coins - ? WHERE user_id = ?', (bet_amount, user_id))
         conn.commit()
         
@@ -161,22 +141,21 @@ async def place_bet(user_id, bet_amount, bet_on):
         conn.commit()
         
         if outcome == 1:
-
             winnings = bet_amount * 2
             cursor.execute('UPDATE user_profiles SET coins = coins + ? WHERE user_id = ?', (winnings, user_id))
             conn.commit()
             return f"You won! You have gained {winnings} coins."
         else:
-            return f"You lost! Better luck next time."
+            return "You lost! Better luck next time."
     else:
         return "You don't have enough coins to place this bet."
 
-# Lottery
 async def enter_lottery(user_id, entry_amount):
+    conn = get_database_connection()
+    cursor = conn.cursor()
     user_profile = await get_user_profile(user_id)
     
     if user_profile and user_profile['coins'] >= entry_amount:
-
         cursor.execute('UPDATE user_profiles SET coins = coins - ? WHERE user_id = ?', (entry_amount, user_id))
         conn.commit()
         
@@ -186,10 +165,10 @@ async def enter_lottery(user_id, entry_amount):
         return f"You have successfully entered the lottery with {entry_amount} coins."
     else:
         return "You don't have enough coins to enter the lottery."
-    
-# Lottery Result
-async def draw_lottery():
 
+async def draw_lottery():
+    conn = get_database_connection()
+    cursor = conn.cursor()
     cursor.execute('SELECT entry_id, user_id, entry_amount FROM lottery_entries')
     entries = cursor.fetchall()
     
@@ -203,7 +182,5 @@ async def draw_lottery():
     cursor.execute('UPDATE user_profiles SET coins = coins + ? WHERE user_id = ?', (total_pot, winner_id))
     conn.commit()
     
-    cursor.execute('DELETE FROM lottery_entries')
-    conn.commit()
-    
-    return f"Congratulations <@{winner_id}>! You have won the lottery with a total of {total_pot} coins!"
+    return f"The lottery winner is user {winner_id} with a total pot of {total_pot} coins."
+
