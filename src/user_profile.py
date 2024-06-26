@@ -22,6 +22,7 @@ def get_database_connection():
         initialize_global_connection()
     return global_conn
 
+# Create Tables
 async def create_profile_table():
     conn = get_database_connection()
     cursor = conn.cursor()
@@ -32,6 +33,33 @@ async def create_profile_table():
             xp INTEGER DEFAULT 0,
             level INTEGER DEFAULT 1,
             coins INTEGER DEFAULT 0
+        )
+    ''')
+    conn.commit()
+
+async def create_bets_table():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS bets (
+            bet_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            bet_amount INTEGER,
+            outcome INTEGER,
+            is_settled BOOLEAN DEFAULT 0
+        )
+    ''')
+    conn.commit()
+
+async def create_lottery_entries_table():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lottery_entries (
+            entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            entry_amount INTEGER,
+            entry_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     conn.commit()
@@ -98,33 +126,6 @@ async def display_profile(user_id, channel, client):
             await channel.send("User profile not found.")
         else:
             print(f"Error: Expected discord.TextChannel, got {type(channel)}")
-
-async def create_bets_table():
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS bets (
-            bet_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            bet_amount INTEGER,
-            outcome INTEGER,
-            is_settled BOOLEAN DEFAULT 0
-        )
-    ''')
-    conn.commit()
-
-async def create_lottery_entries_table():
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS lottery_entries (
-            entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            entry_amount INTEGER,
-            entry_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
 
 async def place_bet(user_id, bet_amount, bet_on):
     conn = get_database_connection()
