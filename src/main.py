@@ -5,7 +5,7 @@ import discord
 import signal
 import sys
 import subprocess
-from user_profile import conn, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed
+from user_profile import get_database_connection, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery, create_profile_table, create_bets_table, create_lottery_entries_table
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
@@ -32,10 +32,16 @@ yt_dlp_options = {"format": "bestaudio/best"}
 ytdl = yt_dlp.YoutubeDL(yt_dlp_options)
 ffmpeg_options = {'options': '-vn -filter:a "volume=0.50"'}
 
+async def setup_database():
+    await create_profile_table()
+    await create_bets_table()
+    await create_lottery_entries_table()
+
 # Initiate
 @client.event
-async def on_ready() -> None:
+async def on_ready():
     print(f'{client.user} is now running!')
+    await setup_database()
 
 # XP & Coin Rate
 XP_RATE = 5
@@ -215,7 +221,6 @@ async def translate_to_emoji(text):
         print(f"Error translating to emoji: {e}")
         return "Failed to translate to emojis."
 
-
 # Message
 @client.event
 async def on_message(message: Message) -> None:
@@ -371,6 +376,35 @@ async def on_message(message: Message) -> None:
         translated_text = await translate_to_emoji(text_to_translate)
         await message.channel.send(translated_text)
 
+    # Bet
+    elif user_message.startswith('?bet'):
+        parts = user_message.split()
+        if len(parts) != 2 or not parts[1].isdigit():
+            await channel.send("Usage: ?bet <amount>")
+        else:
+            amount = int(parts[1])
+            response = await place_bet(message.author.id, amount)
+            await channel.send(response)
+    
+    # Lottery Entry
+    elif user_message.startswith('?lottery'):
+        parts = user_message.split()
+        if len(parts) != 2 or not parts[1].isdigit():
+            await channel.send("Usage: ?lottery <amount>")
+        else:
+            amount = int(parts[1])
+            response = await enter_lottery(message.author.id, amount)
+            await channel.send(response)
+    
+    # Draw Lottery
+    elif user_message.startswith('?drawlottery'):
+        if any(role.permissions.administrator for role in message.author.roles):
+            response = await draw_lottery()
+            await channel.send(response)
+        else:
+            await channel.send("You do not have permission to draw the lottery.")
+
+    # Response.py
     else:
         response = get_response(user_message, str(message.author.id))
         await message.channel.send(response)
@@ -391,6 +425,7 @@ async def send_message(message: Message, user_message: str) -> None:
 # Disconnect
 def signal_handler(sig, frame):
     print("Shutting down...")
+    conn = get_database_connection()
     conn.close()
     async def close_client():
         for vc in client.voice_clients:
