@@ -5,7 +5,7 @@ import discord
 import signal
 import sys
 import subprocess
-from user_profile import get_database_connection, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery
+from user_profile import get_database_connection, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery, create_profile_table, create_bets_table, create_lottery_entries_table
 from typing import Final
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, Embed
@@ -32,10 +32,16 @@ yt_dlp_options = {"format": "bestaudio/best"}
 ytdl = yt_dlp.YoutubeDL(yt_dlp_options)
 ffmpeg_options = {'options': '-vn -filter:a "volume=0.50"'}
 
+async def setup_database():
+    await create_profile_table()
+    await create_bets_table()
+    await create_lottery_entries_table()
+
 # Initiate
 @client.event
-async def on_ready() -> None:
+async def on_ready():
     print(f'{client.user} is now running!')
+    await setup_database()
 
 # XP & Coin Rate
 XP_RATE = 5
