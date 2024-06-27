@@ -1,23 +1,19 @@
-import requests
-import random
-import re
-import html
 from random import choice, randint
 from typing import Final
 from datetime import datetime, timedelta
 from fuzzywuzzy import process
 from googletrans import Translator
 from urllib.parse import quote
+import re
 
+from utils.general import no_message_response
+from commands.utility_commands import calculator_response
+from utils.general_api import time_in_response, weather_response, hackernews_response, translate_response, dictionary_response, unit_conversion_response, exchange_rate_response, currency_conversion_response, crypto_price_response, color_palette_response, meme_response, joke_response, dadjoke_response, quote_response, fact_response, advice_response, affirmation_response, inspiration_response, yes_no_gif_response, pokemon_info_response, waifu_image_response
+from utils.game_logic import play_rps_response, start_guesser_response, play_guesser_response
+from commands.trivia_commands import trivia_game
+from utils.game_logic import game_states
+from utils.fun_api import hello_response, how_are_you_response, roll_dice_response, flip_coin_response, random_number_response
 
-# Response to an unsupported message
-def choose_random_response(user_input: str) -> str:
-    responses: Final[str] = [
-        'Please refer to `?help` to learn more about what I can do.',
-        'Please use `?help` to view all my supported commands.',
-        'Please type `?help` to see all the supported features.',
-    ]
-    return random.choice(responses) if user_input else 'You did not say anything...'
 
 # Responses
 def get_response(user_input: str, user_id: str = None) -> str:
@@ -25,38 +21,26 @@ def get_response(user_input: str, user_id: str = None) -> str:
 
     # No Message
     if lowered == '':
-        return 'Well, this is awkward...'
-    
-    elif 'bug' in lowered:
-        return 'For feature requests and bug reports, please review the [GitHub documentation](<https://github.com/jntm7/yumikord>). \nIf it is unable to be resolved, feel free to [open a new issue](<https://github.com/jntm7/Yumikord/issues>).\nPlease ensure the respective labels `enhancement` for feature requests and `bug` for issues are assigned.'
+        return no_message_response()
 
     # Calculator
     elif 'calculate' in lowered:
         expression = lowered.replace('calculate', '', 1).strip()
-        if validate_expression(expression):
-            return f'The answer is: {calculator(expression)}'
-        else:
-            return 'Please enter a valid calculation expression.'
+        return calculator_response(expression)
 
     # World Clock
     elif 'time in' in lowered:
          city = lowered.replace('time in', '', 1).strip()
-         if city:
-            return get_current_time(city)
-         else:
-             return 'Please enter a valid city name.'
+         return time_in_response(city)
          
     # World Weather
     elif 'weather in' in lowered:
         city = lowered.replace('weather in', '', 1).strip()
-        if city:
-            return get_weather(city)
-        else:
-            return 'Please enter a valid city name.'
+        return weather_response(city)
         
     # Hacker News
     elif 'hackernews' in lowered:
-        return get_hackernews()
+        return hackernews_response()
 
     # Translate
     elif lowered.startswith('translate'):
@@ -66,16 +50,12 @@ def get_response(user_input: str, user_id: str = None) -> str:
         text_to_translate = segments[1]
         source_language = segments[2]
         target_language = segments[3]
-        translated_text, pronunciation = translate_text(text_to_translate, source_language, target_language)
-        if pronunciation is not None:
-            return f"Translated Text:\n{translated_text}\n\nPronunciation:\n{pronunciation}"
-        else:
-            return f"Translated Text:\n{translated_text}"
+        return translate_response(text_to_translate, source_language, target_language)
 
     # Dictionary
     elif lowered.startswith('dictionary.'):
         word = lowered.split('.', 1)[1]
-        return get_dictionary(word)
+        return dictionary_response(word)
 
     # Unit Conversion
     elif lowered.startswith('convert'):
@@ -86,8 +66,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             value = float(segments[1])
             from_unit = segments[2]
             to_unit = segments[3]
-            result = convert_units(value, from_unit, to_unit, conversion_factors)
-            return result
+            return unit_conversion_response(value, from_unit, to_unit)
         except ValueError:
             return 'Invalid value for conversion. Please enter a numeric value.'
     
@@ -97,7 +76,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
         if len(parts) == 3:
             from_currency = parts[1].upper()
             to_currency = parts[2].upper()
-            return get_exchange_rate(from_currency, to_currency)
+            return exchange_rate_response(from_currency, to_currency)
         else:
             return "Please provide the currencies in the format: rate.<currency>.<currency>."
 
@@ -108,7 +87,7 @@ def get_response(user_input: str, user_id: str = None) -> str:
             amount = float(parts[1])
             from_currency = parts[2].upper()
             to_currency = parts[3].upper()
-            return convert_currency(amount, from_currency, to_currency)
+            return currency_conversion_response(amount, from_currency, to_currency)
         else:
             return "Please provide the conversion in the format exchange.<amount>.<currency>.<currency>."
 
@@ -117,48 +96,47 @@ def get_response(user_input: str, user_id: str = None) -> str:
         parts = lowered.split('.')
         if len(parts) == 2:
             id = parts[1].lower()
-            price_info = get_crypto(id)
-            return price_info
+            return crypto_price_response(id)
         else:
             return "Please provide the cryptocurrency symbol in the format crypto.<name>."
 
     # Color Palette
     elif 'color' in lowered:
-        return get_color_palette()
+        return color_palette_response()
 
     # Memes
     elif 'meme' in lowered:
-        return get_meme()
+        return meme_response()
     
     # Jokes
     elif 'joke' in lowered:
-        return get_joke()
+        return joke_response()
     
     elif 'dadjoke' in lowered:
-        return get_dadjoke()
+        return dadjoke_response()
     
     # Quotes
     elif 'quote' in lowered:
-        return get_quote()
+        return quote_response()
     
     # Facts
     elif 'fact' in lowered:
-        return get_fact()
+        return fact_response()
     
     elif 'advice' in lowered:
-        return get_advice()
+        return advice_response()
     
     # Affirmation
     elif 'affirm' in lowered:
-        return get_affirmation()
+        return affirmation_response()
 
     # Inspiration
     elif 'inspire' in lowered:
-        return get_inspiration()
+        return inspiration_response()
     
     # Yes / No GIF
     elif 'yesno' in lowered:
-        return get_yes_no_gif()
+        return yes_no_gif_response()
     
     # Pokemon Information
     elif lowered.startswith('pokemon.'):
@@ -166,50 +144,50 @@ def get_response(user_input: str, user_id: str = None) -> str:
         if len(segments) < 2:
             return 'Please enter a valid Pokémon.'
         pokemon_name = segments[1].strip()
-        return get_pokemon_info(pokemon_name)
+        return pokemon_info_response(pokemon_name)
     
     # Waifu Image
     elif lowered == 'waifu':
-        return get_waifu_image()
+        return waifu_image_response()
     elif lowered == 'waifu.nsfw':
-        return get_waifu_image(nsfw=True)
+        return waifu_image_response(nsfw=True)
 
     # OTHER RESPONSES
     # Hello  
     elif 'hello' in lowered:
-        return 'Hello there!'
+        return hello_response()
     
     # How are you
     elif 'how are you' in lowered:
-        return 'Great, thanks!'
+        return how_are_you_response()
     
     # Roll Dice
     elif 'dice' in lowered:
-        return f'You rolled: {roll_dice()}'
+        return roll_dice_response()
     
     # Flip Coin
     elif 'coin' in lowered:
-        return f'You got: {flip_coin()}'
+        return flip_coin_response()
     
     # Random Number
     elif 'number' in lowered:
-        return f'You got: {random_number()}'
+        return random_number_response()
     
     # Rock Paper Scissors
     elif lowered == 'play.rps':
-        active_rps[user_id] = True
+        game_states[user_id] = {'active': True}
         return "Let's play Rock-Paper-Scissors! Type 'rock', 'paper', or 'scissors' to make your choice."
-    
-    elif user_id in active_rps and lowered in ['rock', 'paper', 'scissors']:
-        return play_rps(user_id, lowered)
+
+    elif user_id in game_states and game_states[user_id]['active'] and lowered in ['rock', 'paper', 'scissors']:
+        return play_rps_response(user_id, lowered)
     
     # Number Guesser
     elif lowered == 'play.guess':
-        return start_guesser(user_id)
+        return start_guesser_response(user_id)
     
     elif lowered.startswith('guess.'):
         guess = lowered.split('guess.', 1)[1].strip()
-        return play_guesser(user_id, guess)
+        return play_guesser_response(user_id, guess)
 
     # Trivia
     elif lowered.startswith("play.trivia"):
@@ -231,5 +209,13 @@ def get_response(user_input: str, user_id: str = None) -> str:
             else:
                 return "Invalid format. Please use `play.trivia <number>` to answer the question."
 
-    else:
-        return choose_random_response(user_input)
+    def choose_random_response(command):
+        responses = {
+            "greet": ["Hello!", "Hi!", "Hey!"],
+            "bye": ["Goodbye!", "See you!", "Bye!"]
+        }
+        return responses.get(command, ["I don't understand."])[0]
+
+    command = "greet"
+
+    return choose_random_response(command)
