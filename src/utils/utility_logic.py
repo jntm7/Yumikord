@@ -1,6 +1,5 @@
-
 # Unit Converter
-async def convert_units_logic(value, from_unit, to_unit):
+async def convert_units(value, from_unit, to_unit):
     conversion_factors = {
         'miles_to_km': 1.60934,
         'km_to_miles': 0.621371,
