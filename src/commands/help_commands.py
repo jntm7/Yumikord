@@ -75,5 +75,10 @@ class HelpCommands(commands.Cog):
             }
             await self.send_help_embed(ctx.channel, commands)
 
+    @commands.command(name='bug')
+    async def handle_bug_command(self, ctx):
+        response = self.bug_response()
+        await ctx.send(response)
+
 def setup(bot):
     bot.add_cog(HelpCommands(bot))
