@@ -1,5 +1,5 @@
 from discord.ext import commands
-from src.utils.game_logic import play_rps, start_guesser, play_guesser
+from src.utils.game_logic import play_rps, start_guesser, play_guesser, roll_dice, flip_coin, generate_random_number
 import random
 
 # Game Commands
@@ -7,23 +7,23 @@ class GameCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # Roll Dice Command
+    # Dice Roll Command
     @commands.command()
     async def dice(self, ctx):
-        result = random.randint(1, 6)
-        await ctx.send(f"You rolled: {result}")
+        result = roll_dice()
+        await ctx.send(result)
 
-    # Flip Coin Command
+    # Coin Flip Command
     @commands.command()
     async def coin(self, ctx):
-        result = random.choice(['heads', 'tails'])
-        await ctx.send(f"The coin landed on: {result}")
+        result = flip_coin()
+        await ctx.send(result)
 
     # Random Number Command
     @commands.command()
     async def number(self, ctx, min_val: int, max_val: int):
-        result = random.randint(min_val, max_val)
-        await ctx.send(f"Your random number is: {result}")
+        result = generate_random_number(min_val, max_val)
+        await ctx.send(result)
 
     # Rock Paper Scissors Command
     @commands.command()
