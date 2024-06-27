@@ -1,7 +1,7 @@
 import asyncio
 import signal
 from discord import Intents, Client, Message
-from src.models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery, create_profile_table, create_bets_table, create_lottery_entries_table)
+from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery, create_profile_table, create_bets_table, create_lottery_entries_table)
 from responses import get_response
 from config import TOKEN
 
@@ -42,8 +42,10 @@ async def on_message(message: Message) -> None:
 
     await award_xp_and_coins(message.author.id, username)
 
-    response = get_response(user_message, str(message.author.id))
-    await message.channel.send(response)
+    if user_message.startswith('!'):
+        command = user_message[1:]
+        response = get_response(command, str(message.author.id))
+        await message.channel.send(response)
 
 # Disconnect
 def signal_handler(_, __):
