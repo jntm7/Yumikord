@@ -36,7 +36,7 @@ async def on_message(message: Message) -> None:
     
     username: str = str(message.author)
     user_message: str = message.content
-    channel: str = str(message.channel)
+    channel = message.channel
 
     print(f'[{channel}] {username}: "{user_message}"')
 
@@ -44,8 +44,11 @@ async def on_message(message: Message) -> None:
 
     if user_message.startswith('!'):
         command = user_message[1:]
-        response = get_response(command, str(message.author.id))
-        await message.channel.send(response)
+        response = await get_response(command, channel, str(message.author.id))
+        if response:
+            await message.channel.send(response)
+        else:
+            print("No response generated for the command.")
 
 # Disconnect
 def signal_handler(_, __):
