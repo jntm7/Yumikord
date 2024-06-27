@@ -2,11 +2,11 @@ import requests
 import random
 
 # Memes API
-def get_meme() -> str:
+async def get_meme() -> str:
     try:
         response = requests.get("https://meme-api.com/gimme")
         response.raise_for_status()
-        meme = response.json()
+        meme = await response.json()
         return meme["url"]
     except Exception as e:
         return f"Couldn't retrieve any memes right now. Please try again later! ({e})"
