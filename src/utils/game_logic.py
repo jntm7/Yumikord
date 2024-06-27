@@ -2,6 +2,21 @@ import random
 
 game_states = {}
 
+# Dice Roll Logic
+def roll_dice():
+    result = random.randint(1, 6)
+    return f"You rolled: {result}"
+
+# Coin Flip Logic
+def flip_coin():
+    result = random.choice(['heads', 'tails'])
+    return f"The coin landed on: {result}"
+
+# Random Number Generator Logic
+def generate_random_number(min_val: int, max_val: int):
+    result = random.randint(min_val, max_val)
+    return f"Your random number is: {result}"
+
 # Rock Paper Scissors Logic
 def play_rps(user_id, user_choice):
     choices = ['rock', 'paper', 'scissors']
