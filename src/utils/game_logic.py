@@ -8,15 +8,23 @@ def play_rps(user_id, user_choice):
     if user_choice not in choices:
         return "Invalid choice. Please choose rock, paper, or scissors."
     
+    # Check if there's an ongoing game for the user
+    if user_id in game_states and game_states[user_id]['active']:
+        return "You already have an ongoing game. Please finish it before starting a new one."
+    
     bot_choice = random.choice(choices)
+    result = ""
     if user_choice == bot_choice:
-        return f"Both chose {user_choice}. It's a tie!"
+        result = f"Both chose {user_choice}. It's a tie!"
     elif (user_choice == "rock" and bot_choice == "scissors") or \
          (user_choice == "paper" and bot_choice == "rock") or \
          (user_choice == "scissors" and bot_choice == "paper"):
-        return f"You chose {user_choice} and I chose {bot_choice}. You win!"
+        result = f"You chose {user_choice} and I chose {bot_choice}. You win!"
     else:
-        return f"You chose {user_choice} and I chose {bot_choice}. I win!"
+        result = f"You chose {user_choice} and I chose {bot_choice}. I win!"
+    
+    game_states[user_id] = {'active': False, 'last_result': result}
+    return result
 
 # Number Guesser Game Initialization
 def start_guesser(user_id):
