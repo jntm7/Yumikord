@@ -2,6 +2,11 @@ import requests
 import random
 import html
 
+def handle_trivia_command(command):
+    trivia_game = TriviaGame()
+    response = trivia_game.start_game()
+    return response
+
 # Trivia
 class TriviaGame:
     def __init__(self):
