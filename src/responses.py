@@ -155,9 +155,9 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
     
     # Waifu Image
     elif lowered == 'waifu':
-        return await get_waifu_image()
+        return get_waifu_image()
     elif lowered == 'waifu.nsfw':
-        return await get_waifu_image(nsfw=True)
+        return get_waifu_image(nsfw=True)
 
     # OTHER RESPONSES
     # Hello  
@@ -178,7 +178,17 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
     
     # Random Number
     elif 'number' in lowered:
-        return generate_random_number()
+        parts = lowered.split()
+        number_index = parts.index('number') if 'number' in parts else -1
+        if number_index != -1 and number_index + 1 < len(parts):
+            try:
+                min_val = int(parts[number_index + 1])
+                max_val = int(parts[number_index + 2]) if number_index + 2 < len(parts) else 100
+                return generate_random_number(min_val, max_val)
+            except ValueError:
+                return "Please enter valid numbers for the range."
+        else:
+            return generate_random_number(1, 100)
     
     # Rock Paper Scissors
     elif lowered == 'play.rps':
