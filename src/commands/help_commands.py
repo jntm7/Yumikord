@@ -31,7 +31,7 @@ class HelpCommands(commands.Cog):
 
         "dice": "Rolls a 6-sided dice.",
         "coin": "Flips a 2-sided coin.",
-        "number <min> <max>`": "Generates a random number between a specified range.",
+        "number <min> <max>`": "Generates a random number between a specified range. Range is 1-100 unless specified.",
         "play.rps": "Play a game of rock-paper-scissors.",
         "play.guess": "Play a game of number guessing.",
         "guess.<number>": "Input after starting the number guessing game.",
