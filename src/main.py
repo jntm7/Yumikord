@@ -1,25 +1,28 @@
 import asyncio
 import signal
-from discord import Intents, Client, Message
-from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, display_profile, get_leaderboard, display_leaderboard_embed, place_bet, enter_lottery, draw_lottery, create_profile_table, create_bets_table, create_lottery_entries_table)
+from discord import Intents, Client, Message, commands
 from responses import get_response
 from config import TOKEN
+from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, create_lottery_entries_table)
+from commands.audio_commands import AudioCommands
 
 intents: Intents = Intents.default()
 intents.message_content = True
 intents.messages = True
-client: Client = Client(intents=intents)
 
 async def setup_database():
     await create_profile_table()
     await create_bets_table()
     await create_lottery_entries_table()
 
+bot = commands.Bot(command_prefix='!', intents=intents)
+
 # Initiate
-@client.event
+@bot.event
 async def on_ready():
-    print(f'{client.user} is now running!')
+    print(f'{bot.user} is now running!')
     await setup_database()
+    bot.add_cog(AudioCommands(bot))
 
 # XP & Coin Rate
 XP_RATE = 5
@@ -29,11 +32,13 @@ async def award_xp_and_coins(user_id, username):
     await add_xp_and_coins(user_id, XP_RATE, COIN_RATE)
 
 # Message
-@client.event
+@bot.event
 async def on_message(message: Message) -> None:
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     
+    await bot.process_commands(message)
+
     username: str = str(message.author)
     user_message: str = message.content
     channel = message.channel
@@ -42,14 +47,6 @@ async def on_message(message: Message) -> None:
 
     await award_xp_and_coins(message.author.id, username)
 
-    if user_message.startswith('!'):
-        command = user_message[1:]
-        response = await get_response(command, channel, str(message.author.id))
-        if response:
-            await message.channel.send(response)
-        else:
-            print("No response generated for the command.")
-
 # Disconnect
 def signal_handler(_, __):
     print("Shutting down...")
@@ -57,9 +54,9 @@ def signal_handler(_, __):
     conn.close()
     
     async def close_client():
-        for vc in client.voice_clients:
+        for vc in bot.voice_clients:
             await vc.disconnect()
-        await client.close()
+        await bot.close()
 
     asyncio.run(close_client())
 
@@ -67,7 +64,7 @@ signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
 def main():
-    client.run(TOKEN)
+    bot.run(TOKEN)
 
 if __name__ == '__main__':
     main()
