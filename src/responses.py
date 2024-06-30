@@ -1,10 +1,8 @@
-
 from typing import Final
 from datetime import datetime, timedelta
 from fuzzywuzzy import process
 from googletrans import Translator
 from urllib.parse import quote
-
 
 # Import Called Functions
 from utils.general import choose_random_response, no_message_response, bug_response
@@ -23,12 +21,12 @@ def setup_responses(bot):
 
 # Get Responses
 async def get_response(user_input: str, channel, user_id: str = None) -> str:
-    command: str = user_input.lower()
-
-    if not command.startswith('!'):
+    if not user_input.startswith('!'):
         return "Commands should start with '!'"
 
-    command = command[1:].split(' ')[0]
+    parts = user_input[1:].split(maxsplit=1)
+    command = parts[0].lower()
+    args = parts[1] if len(parts) > 1 else ""
 
     # No Message
     if command == '':
@@ -43,9 +41,8 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
         return await bug_response()
 
     # Calculator
-    elif command.startswith('calculate'):
-        expression = command[len('calculate'):].strip()
-        return await calculator(expression)
+    elif command == 'calculate':
+        return calculator(args)
 
     # World Clock
     elif command.startswith('time in'):
