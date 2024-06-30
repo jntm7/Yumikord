@@ -62,5 +62,5 @@ class GeneralCommands(commands.Cog):
     # HackerNews Command
     @commands.command()
     async def get_hackernews(self, ctx):
-        top_story = get_hackernews()
+        top_story = await get_hackernews()
         await ctx.send(top_story)
