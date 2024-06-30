@@ -1,3 +1,6 @@
+import re
+from typing import List, Union
+
 # Unit Converter
 async def convert_units(value, from_unit, to_unit):
     conversion_factors = {
@@ -61,30 +64,60 @@ async def convert_units(value, from_unit, to_unit):
     return f"{value} {from_unit} is {converted_value:.2f} {to_unit}"
 
 # Calculator
-def calculator(user_input: str) -> str:
-    tokens = user_input.split()
+def tokenize(expression: str) -> List[str]:
+    return re.findall(r'\d+\.?\d*|\+|\-|\*|\/|\(|\)', expression)
+
+def is_number(token: str) -> bool:
     try:
-        num1 = float(tokens[0])
-        operator = tokens[1]    
-        num2 = float(tokens[2])
-
-        if operator == '+':
-            result = num1 + num2
-        elif operator == '-':
-            result = num1 - num2
-        elif operator == '*':
-            result = num1 * num2
-        elif operator == '/':
-            if num2 == 0: 
-                return 'Division by zero is not possible.'
-            result = num1 / num2
-        else:
-            return 'Please enter a valid operator: +, -, *, /.'
-
-        return f'{result}'
-
+        float(token)
+        return True
     except ValueError:
-        return 'Please enter valid numbers for calculation.'
+        return False
 
-def validate_expression(expression: str) -> bool:
-    return any(char.isdigit() for char in expression) and any(char in expression for char in ['+', '-', '*', '/'])
+def apply_operator(operators: List[str], values: List[float], operator: str):
+    right = values.pop()
+    left = values.pop()
+    if operator == '+':
+        values.append(left + right)
+    elif operator == '-':
+        values.append(left - right)
+    elif operator == '*':
+        values.append(left * right)
+    elif operator == '/':
+        if right == 0:
+            raise ValueError("Division by zero")
+        values.append(left / right)
+
+def calculate(tokens: List[str]) -> float:
+    operators = []
+    values = []
+    precedence = {'+': 1, '-': 1, '*': 2, '/': 2}
+
+    for token in tokens:
+        if is_number(token):
+            values.append(float(token))
+        elif token == '(':
+            operators.append(token)
+        elif token == ')':
+            while operators and operators[-1] != '(':
+                apply_operator(operators, values, operators.pop())
+            operators.pop()
+        elif token in precedence:
+            while operators and operators[-1] != '(' and precedence.get(operators[-1], 0) >= precedence[token]:
+                apply_operator(operators, values, operators.pop())
+            operators.append(token)
+
+    while operators:
+        apply_operator(operators, values, operators.pop())
+
+    return values[0]
+
+def calculator(expression: str) -> str:
+    try:
+        tokens = tokenize(expression)
+        result = calculate(tokens)
+        return f"The answer is: {result}"
+    except ValueError as e:
+        return str(e)
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
