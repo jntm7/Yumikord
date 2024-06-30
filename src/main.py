@@ -5,6 +5,7 @@ from responses import get_response
 from config import TOKEN
 from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, create_lottery_entries_table)
 from commands.audio_commands import AudioCommands
+from commands.profile_commands import ProfileCommands
 
 intents: Intents = Intents.default()
 intents.message_content = True
@@ -23,6 +24,7 @@ async def on_ready():
     print(f'{bot.user} is now running!')
     await setup_database()
     bot.add_cog(AudioCommands(bot))
+    bot.add_cog(ProfileCommands(bot))
 
 # XP & Coin Rate
 XP_RATE = 5
@@ -53,12 +55,14 @@ def signal_handler(_, __):
     conn = get_database_connection()
     conn.close()
     
-    async def close_client():
-        for vc in bot.voice_clients:
-            await vc.disconnect()
-        await bot.close()
+    loop = asyncio.get_event_loop()
+    tasks = [vc.disconnect() for vc in bot.voice_clients]
+    tasks.append(bot.close())
 
-    asyncio.run(close_client())
+    if loop.is_running():
+        loop.create_task(asyncio.wait(tasks))
+    else:
+        loop.run_until_complete(asyncio.wait(tasks))
 
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
