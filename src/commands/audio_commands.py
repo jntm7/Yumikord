@@ -55,7 +55,7 @@ class AudioCommands(commands.Cog):
     @commands.command(name='viewqueue')
     async def viewqueue(self, ctx):
         guild_id = ctx.guild.id
-        queue = self.audio_player.get_queue(guild_id)  # Assuming get_queue method exists
+        queue = self.audio_player.get_queue(guild_id)
         if queue:
             queue_message = "Current queue:\n"
             for i, (title, link) in enumerate(queue, start=1):
