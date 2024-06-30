@@ -1,11 +1,13 @@
 import asyncio
 import signal
-from discord import Intents, Client, Message, commands
-from responses import get_response
+from discord import Intents, Message
+from discord.ext.commands import Bot
+from responses import get_response, setup_responses
 from config import TOKEN
 from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, create_lottery_entries_table)
 from commands.audio_commands import AudioCommands
 from commands.profile_commands import ProfileCommands
+from commands.help_commands import HelpCommands
 
 intents: Intents = Intents.default()
 intents.message_content = True
@@ -16,15 +18,22 @@ async def setup_database():
     await create_bets_table()
     await create_lottery_entries_table()
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = Bot(command_prefix="!",intents=intents)
 
 # Initiate
 @bot.event
 async def on_ready():
     print(f'{bot.user} is now running!')
+
     await setup_database()
-    bot.add_cog(AudioCommands(bot))
-    bot.add_cog(ProfileCommands(bot))
+
+    setup_responses(bot)
+
+    bot.remove_command('help')
+
+    await bot.add_cog(AudioCommands(bot))
+    await bot.add_cog(ProfileCommands(bot))
+    await bot.add_cog(HelpCommands(bot))
 
 # XP & Coin Rate
 XP_RATE = 5
@@ -39,7 +48,9 @@ async def on_message(message: Message) -> None:
     if message.author == bot.user:
         return
     
-    await bot.process_commands(message)
+    response = await get_response(message.content, message.channel, message.author.id)
+    if response:
+        await message.channel.send(response)
 
     username: str = str(message.author)
     user_message: str = message.content
