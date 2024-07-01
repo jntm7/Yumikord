@@ -4,7 +4,7 @@ from discord import Intents, Message
 from discord.ext.commands import Bot
 from responses import get_response, setup_responses
 from config import TOKEN
-from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, create_lottery_entries_table)
+from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table)
 from commands.audio_commands import AudioCommands
 from commands.profile_commands import ProfileCommands
 from commands.help_commands import HelpCommands
@@ -16,7 +16,6 @@ intents.messages = True
 async def setup_database():
     await create_profile_table()
     await create_bets_table()
-    await create_lottery_entries_table()
 
 bot = Bot(command_prefix="!",intents=intents)
 
