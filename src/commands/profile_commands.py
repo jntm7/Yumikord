@@ -6,20 +6,17 @@ class ProfileCommands(commands.Cog):
         self.bot = bot
 
     # Profile Command
-    @commands.command()
-    async def profile(self, ctx):
-        await display_profile(ctx.author.id, ctx.channel, self.bot)
+    async def display_profile(self, user_id, channel):
+        await display_profile(user_id, channel, self.bot)
 
     # Leaderboard Command
-    @commands.command()
-    async def leaderboard(self, ctx):
-        guild = ctx.guild
-        leaderboard_data = await get_leaderboard(guild)
+    async def display_leaderboard_embed(self, channel):
+        leaderboard_data = await get_leaderboard()
         if leaderboard_data:
             leaderboard_embed = display_leaderboard_embed(leaderboard_data)
-            await ctx.send(embed=leaderboard_embed)
+            await channel.send(embed=leaderboard_embed)
         else:
-            await ctx.send("No leaderboard data available.")
+            await channel.send("No leaderboard data available.")
 
     # Bet Command
     @commands.command()
