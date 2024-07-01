@@ -26,7 +26,7 @@ Obtain your **Discord token** by:
 - Before resetting, scroll down to `Privileged Gateway Intents`
 - Assign the bot `MESSAGE CONTENT INTENT` (and `SERVER MEMBERS INTENT` if you choose to).
 - Click `Reset Token` and complete 2FA if it is enabled on your Discord account.
-- Copy your Discord token that will be needed in [Step 6](#%EF%B8%8F-step-6-assigning-the-discord-token). 
+- Copy your Discord token that will be needed in [Step 7](#%EF%B8%8F-step-7-assigning-the-discord-token). 
 
 ### 🔨 Step 3: Assigning Bot Permissions
 
@@ -47,25 +47,31 @@ Please ensure that you have Python and Node.js installed.
 
 ## 🛠️ Installation
 
-### ⚙️ Step 5: Clone / Download the Project
-
+### ⚙️ Step 5: Clone the Repository
 
 - Clone this repository or [download the source code](https://github.com/jntm7/Yumikord/archive/refs/heads/main.zip).
 - Navigate to the project directory in your terminal.
-- Install Python dependencies:
-  
+
+### ⚙️ Step 6: Setup Environment
+
+Depending on your operating system, run the appropriate setup script to install all necessary dependencies and configure your environment.
+
+- **For Windows:**
+
     ```
-    pip install -r requirements.txt
-    ```
-- Install Node.js dependencies:
-  
-    ```
-    cd emoji-translate
-    npm install
-    cd ..
+    setup.bat
     ```
 
-### ⚙️ Step 6: Assigning the Discord Token
+- **For Unix-like systems (Linux, macOS):**
+
+    ```
+    chmod +x setup.sh
+    ./setup.sh
+    ```
+
+This will install Python & Node.js dependencies and guide you through adding necessary environment variables to your `.env` file.
+
+### ⚙️ Step 7: Assigning the Discord Token
 
 - Retrieve your Discord token from the [Discord Developer Portal](https://discord.com/developers/applications) that we set up in [Step 2](#-step-2-creating-a-discord-token).
 - Open the [.env file](build\.env) with a text editor (e.g. Notepad) and add your Discord token:
@@ -76,7 +82,7 @@ Please ensure that you have Python and Node.js installed.
 
    **Keep this token secure** and refrain from sharing it, as it will grant anyone with it unrestricted access to your bot and server.
 
-### ⚙️ Step 7: Running the Application
+### ⚙️ Step 8: Running the Application
 
 - Run the bot by using:
   
@@ -85,7 +91,7 @@ Please ensure that you have Python and Node.js installed.
      ```
 - If successful, `"YOURBOTNAME is now running!"` will be printed in the terminal. Your bot should appear online in your Discord server.
 
-### ⚙️ Step 8: Running Commands
+### ⚙️ Step 9: Running Commands
 
 To interact with the bot:
 - Use [commands](COMMANDS.md) in any channel where the bot is present.
