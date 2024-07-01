@@ -54,7 +54,7 @@ Please ensure that you have Python and Node.js installed.
 
 ### ⚙️ Step 6: Setup Environment
 
-Depending on your operating system, run the appropriate setup script to install all necessary dependencies and configure your environment.
+Run the appropriate setup script to install the necessary Python & Node.js dependencies and configure your environment.
 
 - **For Windows:**
 
@@ -68,8 +68,6 @@ Depending on your operating system, run the appropriate setup script to install 
     chmod +x setup.sh
     ./setup.sh
     ```
-
-This will install Python & Node.js dependencies and guide you through adding necessary environment variables to your `.env` file.
 
 ### ⚙️ Step 7: Assigning the Discord Token
 
