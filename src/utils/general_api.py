@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import json
 from fuzzywuzzy import process
 from datetime import datetime
 from googletrans import Translator
@@ -8,55 +9,50 @@ from googletrans import Translator
 async def get_weather(city: str) -> str:
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get('https://raw.githubusercontent.com/lutangar/cities.json/master/cities.json') as cities_response:
-                cities_response.raise_for_status()
-                cities = await cities_response.json()
-            city_names = [c['name'] for c in cities]
 
-            exact_matches = [name for name in city_names if name.lower() == city.lower()]
-            if exact_matches:
-                best_match = exact_matches[0]
-            else:
-                startswith_matches = [name for name in city_names if name.lower().startswith(city.lower())]
-                if startswith_matches:
-                    best_match = startswith_matches[0]
-                else:
-                    best_match, match_score = process.extractOne(city, city_names, scorer=process.fuzz.partial_ratio)
-                    if match_score < 80:
-                        return 'Please enter a valid city name.'
+            async with session.get('https://worldtimeapi.org/api/timezone') as timezones_response:
+                timezones_response.raise_for_status()
+                timezones = await timezones_response.json()
+
+            city_names = [tz.split('/')[-1].replace('_', ' ') for tz in timezones if '/' in tz]
+
+            best_match, match_score = process.extractOne(city, city_names, scorer=process.fuzz.partial_ratio)
+            if match_score < 80:
+                return 'Please enter a valid city name.'
 
             city_encoded = best_match.replace(' ', '+')
             async with session.get(f'https://wttr.in/{city_encoded}?format=%C+%t') as weather_response:
                 weather_response.raise_for_status()
                 weather_data = await weather_response.text()
+            
             return f"The weather in {best_match.title()} is: {weather_data}"
+        except aiohttp.ClientError as e:
+            return f"Couldn't connect to the weather service. Please try again later! ({e})"
         except Exception as e:
-            return f"Couldn't retrieve the weather for {city}. Please try again later! ({e})"
+            return f"An unexpected error occurred: {e}"
 
 # World Time API
 async def get_time(city):
     async with aiohttp.ClientSession() as session:
         try:
-            # Fetch available timezones
             async with session.get('https://worldtimeapi.org/api/timezone') as timezones_response:
                 timezones_response.raise_for_status()
                 timezones = await timezones_response.json()
 
-            # Find best match for the given city
             best_match, match_score = process.extractOne(city, timezones, scorer=process.fuzz.partial_ratio)
             if match_score < 80:
                 return None, 'Please enter a valid city name.'
 
-            # Fetch current time for the best match timezone
             async with session.get(f'https://worldtimeapi.org/api/timezone/{best_match}') as time_response:
                 time_response.raise_for_status()
                 data = await time_response.json()
 
             datetime_object = datetime.fromisoformat(data['datetime'])
             current_time = datetime_object.strftime('%I:%M %p')
-            return best_match.replace("_", " ").title(), current_time
+            
+            return best_match.replace("_", " ").title(), f"{current_time}"
         except Exception as e:
-            return None, f"Couldn't retrieve the time. Please try again later! ({e})"
+            return None, f"Couldn't retrieve the time for {city}. Please try again later! ({e})"
 
 # Google Translate API
 translator = Translator()
@@ -67,12 +63,12 @@ async def translate_text(text: str, source_language: str, target_language: str) 
             None,
             translator.translate,
             text,
-            source_language,
-            target_language
+            target_language,
+            source_language
         )
-        return translated.text, translated.pronunciation
+        return translated.text, translated.pronunciation if hasattr(translated, 'pronunciation') else None
     except Exception as e:
-        return f"An error occurred: {str(e)}", None
+        return f"Couldn't retrieve translation. An error occurred: {str(e)}", None
 
 # Dictionary API
 async def get_dictionary(word: str) -> str:
@@ -154,20 +150,27 @@ async def get_crypto(id):
 async def get_color_palette() -> str:
     async with aiohttp.ClientSession() as session:
         try:
-            data = {"model": "default"}
-            async with session.post("http://colormind.io/api/", json=data) as response:
+            data = json.dumps({"model": "default"})
+            headers = {"Content-Type": "application/json"}
+            async with session.post("http://colormind.io/api/", data=data, headers=headers) as response:
                 response.raise_for_status()
-                color_data = await response.json()
-            color_palette = color_data.get("result")
+                text_response = await response.text()
+                try:
+                    color_data = json.loads(text_response)
+                    color_palette = color_data.get("result")
 
-            if not color_palette:
-                return "There was no color palette received from the API. Please try again later!"
-            color_text = "Generated Color Palette:\n"
-            for color in color_palette:
-                color_text += f"RGB: {color}\n"
-            return color_text
+                    if not color_palette:
+                        return "There was no color palette received from the API. Please try again later!"
+                    color_text = "Generated Color Palette:\n"
+                    for color in color_palette:
+                        color_text += f"RGB: {color}\n"
+                    return color_text
+                except json.JSONDecodeError:
+                    return f"The API responded with invalid JSON. Response: {text_response[:100]}..."
+        except aiohttp.ClientError as e:
+            return f"Couldn't connect to the color palette API. Please try again later! ({e})"
         except Exception as e:
-            return f"Couldn't retrieve any color palettes right now. Please try again later! ({e})"
+            return f"An unexpected error occurred: {e}"
 
 # Hacker News API
 async def get_hackernews() -> str:
