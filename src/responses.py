@@ -7,10 +7,13 @@ from utils.game_logic import game_states, roll_dice, flip_coin, generate_random_
 from commands.trivia_commands import handle_trivia_command
 from commands.help_commands import HelpCommands
 from commands.profile_commands import ProfileCommands
+from models.user_profile import handle_bet
 
+# Global Variables
 help_commands = None
 profile_commands = None
 
+# Setup Responses
 def setup_responses(bot):
     global help_commands, profile_commands
     help_commands = HelpCommands(bot)
@@ -39,6 +42,10 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
         await profile_commands.display_leaderboard_embed(channel)
         return None
     
+    # Bet
+    elif command == 'bet':
+        return await handle_bet(user_id, channel, args)
+
     # Help
     elif command == 'help':
         return await help_commands.send_help_embed(channel)
