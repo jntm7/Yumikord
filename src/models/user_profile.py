@@ -185,14 +185,16 @@ async def draw_lottery():
     
     return f"The lottery winner is user {winner_id} with a total pot of {total_pot} coins."
 
-async def get_leaderboard(db_conn):
-    async with db_conn.cursor() as cursor:
-        query = "SELECT username, points FROM users ORDER BY points DESC LIMIT 5"
-        await cursor.execute(query)
-        return await cursor.fetchall()
+async def get_leaderboard():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT username, level, xp, coins FROM user_profiles ORDER BY level DESC, xp DESC LIMIT 5")
+    return cursor.fetchall()
 
-def display_leaderboard_embed(leaderboard):
-    embed = discord.Embed(title="Leaderboard", description="Top users in the server", color=0x00ff00)
-    for rank, (username, points) in enumerate(leaderboard, start=1):
-        embed.add_field(name=f"#{rank} {username}", value=f"{points} points", inline=False)
+def display_leaderboard_embed(leaderboard_data):
+    embed = discord.Embed(title="Leaderboard", description="Top users in the server", color=0x33B0FF)
+    for rank, (username, level, xp, coins) in enumerate(leaderboard_data, start=1):
+        embed.add_field(name=f"#{rank} {username}", 
+                        value=f"Level: {level} | XP: {xp} | Coins: {coins}", 
+                        inline=False)
     return embed
