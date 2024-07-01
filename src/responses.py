@@ -1,9 +1,3 @@
-from typing import Final
-from datetime import datetime, timedelta
-from fuzzywuzzy import process
-from googletrans import Translator
-from urllib.parse import quote
-
 # Import Called Functions
 from utils.general import choose_random_response, no_message_response, bug_response
 from utils.utility_logic import convert_units, calculator
@@ -12,13 +6,16 @@ from utils.fun_api import get_meme, get_joke, get_dadjoke, get_quote, get_fact, 
 from utils.game_logic import game_states, roll_dice, flip_coin, generate_random_number, play_rps, start_guesser, play_guesser
 from commands.trivia_commands import handle_trivia_command
 from commands.help_commands import HelpCommands
+from commands.profile_commands import ProfileCommands
 
 help_commands = None
+profile_commands = None
 
 def setup_responses(bot):
-    global help_commands
+    global help_commands, profile_commands
     help_commands = HelpCommands(bot)
-
+    profile_commands = ProfileCommands(bot)
+ 
 # Get Responses
 async def get_response(user_input: str, channel, user_id: str = None) -> str:
     if not user_input.startswith('!'):
@@ -32,41 +29,61 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
     if command == '':
         return await no_message_response()
 
+    # Profile
+    elif command == 'profile':
+        await profile_commands.display_profile(user_id, channel)
+        return None
+
+    # Leaderboard
+    elif command == 'leaderboard':
+        await profile_commands.display_leaderboard_embed(channel)
+        return None
+    
     # Help
     elif command == 'help':
         return await help_commands.send_help_embed(channel)
 
     # Bug Response
     elif command == 'bug':
-        return await bug_response()
+        return bug_response()
 
     # Calculator
     elif command == 'calculate':
         return calculator(args)
 
-    # World Clock
-    elif command.startswith('time in'):
-        city = command[len('time in'):].strip()
-        return await get_time(city)
-         
-    # World Weather
-    elif command.startswith('weather in'):
-        city = command[len('weather in'):].strip()
-        return await get_weather(city)
-        
+    # Weather
+    elif command == 'weather':
+        if not args:
+            return "Please provide a city name in the format: !weather <city>"
+        weather_info = await get_weather(args)
+        return weather_info
+    
+    # Time
+    elif command == 'time':
+        if not args:
+            return "Please provide a city name in the format: !time <city>"
+        timezone, time_info = await get_time(args)
+        if timezone:
+            return f"The current time in {timezone} is {time_info}"
+        else:
+            return time_info
+
     # Hacker News
     elif command == 'hackernews':
         return await get_hackernews()
 
-    # Translate
-    elif command.startswith('translate'):
-        segments = command.split(' ', 4)
-        if len(segments) < 4:
-            return 'Please enter the text, source language and the target language.'
-        text_to_translate = segments[1]
-        source_language = segments[2]
-        target_language = segments[3]
-        return await translate_text(text_to_translate, source_language, target_language)
+    elif command == 'translate':
+        parts = args.rsplit(maxsplit=2)
+        if len(parts) < 3:
+            return 'Please use the format: !translate <text> <source language> <target language>'
+        text_to_translate = parts[0]
+        source_language = parts[1]
+        target_language = parts[2]
+        translated_text, pronunciation = await translate_text(text_to_translate, source_language, target_language)
+        if pronunciation:
+            return f"Translated text: {translated_text}\nPronunciation: {pronunciation}"
+        else:
+            return f"Translated text: {translated_text}"
 
     # Dictionary
     elif command.startswith('dictionary.'):
@@ -117,41 +134,41 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
             return "Please provide the cryptocurrency symbol in the format crypto.<name>."
 
     # Color Palette
-    elif 'color' in command:
+    elif command == 'color':
         return await get_color_palette()
 
     # Memes
-    elif 'meme' in command:
+    elif command == 'meme':
         return await get_meme()
     
     # Jokes
-    elif 'joke' in command:
+    elif command == 'joke':
         return await get_joke()
     
-    elif 'dadjoke' in command:
+    elif command == 'dadjoke':
         return await get_dadjoke()
     
     # Quotes
-    elif 'quote' in command:
+    elif command == 'quote':
         return await get_quote()
     
     # Facts
-    elif 'fact' in command:
+    elif command == 'fact':
         return await get_fact()
     
-    elif 'advice' in command:
+    elif command == 'advice':
         return await get_advice()
     
     # Affirmation
-    elif 'affirm' in command:
+    elif command == 'affirm':
         return await get_affirmation()
 
     # Inspiration
-    elif 'inspire' in command:
+    elif command == 'inspire':
         return await get_inspiration()
     
     # Yes / No GIF
-    elif 'yesno' in command:
+    elif command == 'yesno':
         return await get_yes_no_gif()
     
     # Pokemon Information
@@ -164,25 +181,25 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
     
     # Waifu Image
     elif command == 'waifu':
-        return get_waifu_image()
+        return await get_waifu_image()
     elif command == 'waifu.nsfw':
-        return get_waifu_image(nsfw=True)
+        return await get_waifu_image(nsfw=True)
 
     # OTHER RESPONSES
     # Hello  
-    elif 'hello' in command:
+    elif command == 'hello':
         return "Hello! How can I help you today?"
     
     # How are you
-    elif 'how are you' in command:
+    elif command == 'how are you':
         return "I'm doing amazing! Hope you are having a fantastic day too!"
     
     # Roll Dice
-    elif 'dice' in command:
+    elif command == 'dice':
         return roll_dice()
     
     # Flip Coin
-    elif 'coin' in command:
+    elif command == 'coin':
         return flip_coin()
     
     # Random Number
@@ -201,14 +218,11 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
     
     # Rock Paper Scissors
     elif 'rps' in command or command in ['rock', 'paper', 'scissors']:
-        # Check if there's an ongoing game
         if user_id in game_states and game_states[user_id]['active']:
-            # If making a move in an active game
             if command in ['rock', 'paper', 'scissors']:
                 return play_rps(user_id, command)
             else:
                 return "Please make a move by typing '!rock', '!paper', or '!scissors'."
-        # If no active game and trying to start a new one
         elif command == 'play.rps':
             game_states[user_id] = {'active': True}
             return "Let's play Rock-Paper-Scissors! Type '!rock', '!paper', or '!scissors' to make your choice."
