@@ -3,6 +3,7 @@ import discord
 import os
 import logging
 import random
+from datetime import datetime
 
 # Database Connection
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -100,9 +101,8 @@ async def add_xp_and_coins(user_id, xp_amount, coin_amount):
 async def display_profile(user_id, channel, client):
     profile = await get_user_profile(user_id)
     if profile:
-        embed = discord.Embed(title=f"User Profile for {profile['username']}", color=0x33B0FF)
-
         user = await client.fetch_user(user_id)
+        embed = discord.Embed(title=f"User Profile for {user.display_name}", color=0x33B0FF)
         embed.set_thumbnail(url=user.avatar.url)
 
         embed.add_field(name="Level", value=str(profile['level']))
@@ -168,10 +168,16 @@ def display_stats_embed(user, stats):
     if not stats:
         return discord.Embed(title="Stats", description="No stats available for this user.", color=0xFF0000)
 
-    embed = discord.Embed(title=f"Stats for {user.display_name}", color=0x33B0FF)
+    embed = discord.Embed(title=f"User Details for {user.display_name}", color=0x33B0FF)
     embed.set_thumbnail(url=user.avatar.url)
-    embed.add_field(name="Joined At", value=stats["joined_at"], inline=False)
-    embed.add_field(name="Roles", value=", ".join(stats["roles"]) if stats["roles"] else "No roles", inline=False)
+    
+    if stats["joined_at"]:
+        joined_at = datetime.fromisoformat(stats["joined_at"].replace('Z', '+00:00'))
+        embed.add_field(name="Joined At", value=joined_at.strftime("%Y-%m-%d %H:%M:%S UTC"), inline=False)
+    else:
+        embed.add_field(name="Joined On", value="Unknown", inline=False)
+    
+    embed.add_field(name="Server Roles", value=", ".join(stats["roles"]) if stats["roles"] else "No roles", inline=False)
     embed.add_field(name="Message Count", value=str(stats["message_count"]), inline=False)
 
     return embed
@@ -196,14 +202,43 @@ async def create_stats_table():
 async def increment_message_count(user_id, guild_id):
     conn = get_database_connection()
     cursor = conn.cursor()
+
+    try:
+        cursor.execute('''
+            INSERT INTO user_stats (user_id, guild_id, message_count) 
+            VALUES (?, ?, 1)
+        ''', (user_id, guild_id))
+
+    except sqlite3.IntegrityError:
+        cursor.execute('''
+            UPDATE user_stats 
+            SET message_count = message_count + 1
+            WHERE user_id = ? AND guild_id = ?
+        ''', (user_id, guild_id))
+    conn.commit()
+
+# Update User Stats
+async def update_user_stats(member):
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    role_names = ','.join([role.name for role in member.roles if role.name != "@everyone"])
     cursor.execute('''
-        INSERT INTO user_stats (user_id, guild_id, message_count) 
-        VALUES (?, ?, 1) 
-        ON CONFLICT(user_id, guild_id) 
-        DO UPDATE SET message_count = message_count + 1, 
-                      roles = (SELECT GROUP_CONCAT(role_name) FROM 
-                              (SELECT name as role_name FROM roles WHERE user_id = ? AND guild_id = ?))
-    ''', (user_id, guild_id, user_id, guild_id))
+        INSERT OR REPLACE INTO user_stats 
+        (user_id, guild_id, joined_at, roles, message_count) 
+        VALUES (?, ?, ?, ?, COALESCE((SELECT message_count FROM user_stats WHERE user_id = ? AND guild_id = ?), 0))
+    ''', (member.id, member.guild.id, member.joined_at.isoformat(), role_names, member.id, member.guild.id))
+    conn.commit()
+
+# Update User Roles
+async def update_user_roles(user_id, guild_id, roles):
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    role_names = ','.join([role.name for role in roles if role.name != "@everyone"])
+    cursor.execute('''
+        UPDATE user_stats 
+        SET roles = ?
+        WHERE user_id = ? AND guild_id = ?
+    ''', (role_names, user_id, guild_id))
     conn.commit()
 
 ######################################################
