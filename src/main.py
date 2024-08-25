@@ -5,7 +5,7 @@ from discord import Intents, Message
 from discord.ext.commands import Bot
 from responses import get_response, setup_responses
 from config import TOKEN
-from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, increment_message_count, create_stats_table)
+from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, increment_message_count, create_stats_table, update_user_stats, update_user_roles)
 from commands.audio_commands import AudioCommands
 from commands.profile_commands import ProfileCommands
 from commands.help_commands import HelpCommands
@@ -68,6 +68,17 @@ async def on_message(message: Message) -> None:
     print(f'[{channel}] {username}: "{user_message}"')
 
     await award_xp_and_coins(message.author.id, username)
+
+# Member Join
+@bot.event
+async def on_member_join(member):
+    await update_user_stats(member)
+
+# Role Update
+@bot.event
+async def on_member_update(before, after):
+    if before.roles != after.roles:
+        await update_user_roles(after.id, after.guild.id, after.roles)
 
 # Disconnect
 def signal_handler(_, __):
