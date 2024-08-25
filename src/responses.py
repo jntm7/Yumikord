@@ -46,7 +46,14 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
     
     # Stats
     elif command == 'stats':
-        await stats_commands.display_stats_embed(channel)
+        parts = args.split()
+        if parts and parts[0].startswith('<@') and parts[0].endswith('>'):
+            target_user_id = parts[0][2:-1]
+            if target_user_id.startswith('!'):
+                target_user_id = target_user_id[1:]
+            await stats_commands.stats_other(user_id, channel, int(target_user_id))
+        else:
+            await stats_commands.stats(user_id, channel)
         return None
 
     # Bet

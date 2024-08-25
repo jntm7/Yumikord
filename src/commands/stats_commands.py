@@ -7,17 +7,23 @@ class StatsCommands(commands.Cog):
         self.bot = bot
 
     async def stats(self, user_id, channel):
-        user = await self.bot.fetch_user(user_id)
         guild = channel.guild
+        user = await self.bot.fetch_user(user_id)
         stats = await get_stats(user_id, guild.id)
-        embed = display_stats_embed(user, stats)
-
-        await channel.send(embed=embed)
-
-    async def display_stats_embed(self, channel):
-        stats_data = await get_stats()
-        if stats_data:
-            stats_embed = display_stats_embed(stats_data)
-            await channel.send(embed=stats_embed)
+        
+        if stats:
+            embed = display_stats_embed(user, stats)
+            await channel.send(embed=embed)
         else:
-            await channel.send("No stats data available.")
+            await channel.send(f"No stats available for user {user.name}")
+
+    async def stats_other(self, user_id, channel, target_user_id):
+        guild = channel.guild
+        target_user = await self.bot.fetch_user(target_user_id)
+        stats = await get_stats(target_user_id, guild.id)
+        
+        if stats:
+            embed = display_stats_embed(target_user, stats)
+            await channel.send(embed=embed)
+        else:
+            await channel.send(f"No stats available for user {target_user.name}")
