@@ -1,5 +1,6 @@
 import asyncio
 import signal
+import discord
 from discord import Intents, Message
 from discord.ext.commands import Bot
 from responses import get_response, setup_responses
@@ -44,9 +45,13 @@ async def award_xp_and_coins(user_id, username):
 # Message
 @bot.event
 async def on_message(message: Message) -> None:
+
     if message.author == bot.user:
         return
     
+    if message.type != discord.MessageType.default:
+        return
+
     response = await get_response(message.content, message.channel, message.author.id)
     if response:
         await message.channel.send(response)
