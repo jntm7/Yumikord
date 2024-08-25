@@ -9,6 +9,7 @@ from models.user_profile import (get_database_connection, initialize_profile, ad
 from commands.audio_commands import AudioCommands
 from commands.profile_commands import ProfileCommands
 from commands.help_commands import HelpCommands
+from commands.stats_commands import StatsCommands
 
 intents: Intents = Intents.default()
 intents.message_content = True
@@ -34,6 +35,7 @@ async def on_ready():
     await bot.add_cog(AudioCommands(bot))
     await bot.add_cog(ProfileCommands(bot))
     await bot.add_cog(HelpCommands(bot))
+    await bot.add_cog(StatsCommands(bot))
 
 # XP & Coin Rate
 XP_RATE = 5
