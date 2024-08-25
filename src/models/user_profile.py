@@ -135,6 +135,36 @@ def display_leaderboard_embed(leaderboard_data):
                         inline=False)
     return embed
 
+# Stats
+async def get_stats(user_id, guild_id):
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT joined_at, roles, message_count FROM user_stats WHERE user_id = ? AND guild_id = ?", (user_id, guild_id))
+    result = cursor.fetchone()
+    if result:
+        joined_at, roles, message_count = result
+        return {
+            "joined_at": joined_at,
+            "roles": roles.split(",") if roles else [],
+            "message_count": message_count
+        }
+    return None
+
+# Display Stats
+def display_stats_embed(user, stats):
+    if not stats:
+        return discord.Embed(title="Stats", description="No stats available for this user.", color=0xFF0000)
+
+    embed = discord.Embed(title=f"Stats for {user.display_name}", color=0x33B0FF)
+    embed.set_thumbnail(url=user.avatar.url)
+    embed.add_field(name="Joined At", value=stats["joined_at"], inline=False)
+    embed.add_field(name="Roles", value=", ".join(stats["roles"]) if stats["roles"] else "No roles", inline=False)
+    embed.add_field(name="Message Count", value=str(stats["message_count"]), inline=False)
+
+    return embed
+
+######################################################
+
 # Bet Logic
 async def update_user_coins(user_id, amount):
     conn = get_database_connection()
