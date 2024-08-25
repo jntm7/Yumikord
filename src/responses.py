@@ -45,7 +45,7 @@ async def get_response(user_input: str, channel, user_id: str = None) -> str:
         return None
     
     # Stats
-    elif command == 'stats':
+    elif command == 'user':
         parts = args.split()
         if parts and parts[0].startswith('<@') and parts[0].endswith('>'):
             target_user_id = parts[0][2:-1]
