@@ -163,6 +163,29 @@ def display_stats_embed(user, stats):
 
     return embed
 
+# Create Stats Table
+async def create_stats_table():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_stats (
+            user_id INTEGER,
+            guild_id INTEGER,
+            joined_at TEXT,
+            roles TEXT,
+            message_count INTEGER DEFAULT 0,
+            PRIMARY KEY (user_id, guild_id)
+        )
+    ''')
+    conn.commit()
+
+# Add Message Count
+async def increment_message_count(user_id, guild_id):
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO user_stats (user_id, guild_id, message_count) VALUES (?, ?, 1) ON CONFLICT(user_id, guild_id) DO UPDATE SET message_count = message_count + 1', (user_id, guild_id))
+    conn.commit()
+
 ######################################################
 
 # Bet Logic

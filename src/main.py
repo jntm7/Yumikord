@@ -5,7 +5,7 @@ from discord import Intents, Message
 from discord.ext.commands import Bot
 from responses import get_response, setup_responses
 from config import TOKEN
-from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table)
+from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, increment_message_count, create_stats_table)
 from commands.audio_commands import AudioCommands
 from commands.profile_commands import ProfileCommands
 from commands.help_commands import HelpCommands
@@ -18,6 +18,7 @@ intents.messages = True
 async def setup_database():
     await create_profile_table()
     await create_bets_table()
+    await create_stats_table()
 
 bot = Bot(command_prefix="!",intents=intents)
 
@@ -53,6 +54,8 @@ async def on_message(message: Message) -> None:
     
     if message.type != discord.MessageType.default:
         return
+
+    await increment_message_count(message.author.id, message.guild.id)
 
     response = await get_response(message.content, message.channel, message.author.id)
     if response:

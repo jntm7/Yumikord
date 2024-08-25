@@ -1,6 +1,6 @@
 from discord.ext import commands
 import random
-from models.user_profile import place_bet, get_leaderboard, display_leaderboard_embed, display_profile
+from models.user_profile import get_leaderboard, display_leaderboard_embed, display_profile
 
 class ProfileCommands(commands.Cog):
     def __init__(self, bot):

@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord import Embed
-from models.user_profile import get_message_count, get_stats, display_stats_embed
+from models.user_profile import get_stats, display_stats_embed
 
 class StatsCommands(commands.Cog):
     def __init__(self, bot):
@@ -14,5 +14,10 @@ class StatsCommands(commands.Cog):
 
         await channel.send(embed=embed)
 
-async def setup(bot):
-    await bot.add_cog(StatsCommands(bot))
+    async def display_stats_embed(self, channel):
+        stats_data = await get_stats()
+        if stats_data:
+            stats_embed = display_stats_embed(stats_data)
+            await channel.send(embed=stats_embed)
+        else:
+            await channel.send("No stats data available.")
