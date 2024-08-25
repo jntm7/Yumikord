@@ -135,6 +135,19 @@ def display_leaderboard_embed(leaderboard_data):
                         inline=False)
     return embed
 
+# User Joins Server
+async def on_member_join(member):
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT OR REPLACE INTO user_stats 
+        (user_id, guild_id, joined_at, roles, message_count) 
+        VALUES (?, ?, ?, ?, ?)
+    ''', (member.id, member.guild.id, member.joined_at.isoformat(), 
+          ','.join([role.name for role in member.roles]), 0))
+    conn.commit()
+
+
 # Stats
 async def get_stats(user_id, guild_id):
     conn = get_database_connection()
@@ -183,7 +196,14 @@ async def create_stats_table():
 async def increment_message_count(user_id, guild_id):
     conn = get_database_connection()
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO user_stats (user_id, guild_id, message_count) VALUES (?, ?, 1) ON CONFLICT(user_id, guild_id) DO UPDATE SET message_count = message_count + 1', (user_id, guild_id))
+    cursor.execute('''
+        INSERT INTO user_stats (user_id, guild_id, message_count) 
+        VALUES (?, ?, 1) 
+        ON CONFLICT(user_id, guild_id) 
+        DO UPDATE SET message_count = message_count + 1, 
+                      roles = (SELECT GROUP_CONCAT(role_name) FROM 
+                              (SELECT name as role_name FROM roles WHERE user_id = ? AND guild_id = ?))
+    ''', (user_id, guild_id, user_id, guild_id))
     conn.commit()
 
 ######################################################
