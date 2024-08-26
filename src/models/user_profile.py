@@ -154,6 +154,7 @@ async def get_stats(user_id, guild_id):
     cursor = conn.cursor()
     cursor.execute("SELECT joined_at, roles, message_count FROM user_stats WHERE user_id = ? AND guild_id = ?", (user_id, guild_id))
     result = cursor.fetchone()
+    print(f"Raw stats data: {result}")
     if result:
         joined_at, roles, message_count = result
         return {
@@ -168,16 +169,19 @@ def display_stats_embed(user, stats):
     if not stats:
         return discord.Embed(title="Stats", description="No stats available for this user.", color=0xFF0000)
 
-    embed = discord.Embed(title=f"User Details for {user.display_name}", color=0x33B0FF)
-    embed.set_thumbnail(url=user.avatar.url)
+    embed = discord.Embed(title=f"Stats for {user.display_name}", color=0x33B0FF)
+    embed.set_thumbnail(url=user.avatar.url if user.avatar else discord.Embed.Empty)
     
     if stats["joined_at"]:
-        joined_at = datetime.fromisoformat(stats["joined_at"].replace('Z', '+00:00'))
-        embed.add_field(name="Joined At", value=joined_at.strftime("%Y-%m-%d %H:%M:%S UTC"), inline=False)
+        try:
+            joined_at = datetime.fromisoformat(stats["joined_at"].replace('Z', '+00:00'))
+            embed.add_field(name="Joined At", value=joined_at.strftime("%Y-%m-%d %H:%M:%S UTC"), inline=False)
+        except ValueError:
+            embed.add_field(name="Joined At", value=str(stats["joined_at"]), inline=False)
     else:
-        embed.add_field(name="Joined On", value="Unknown", inline=False)
+        embed.add_field(name="Joined At", value="Unknown", inline=False)
     
-    embed.add_field(name="Server Roles", value=", ".join(stats["roles"]) if stats["roles"] else "No roles", inline=False)
+    embed.add_field(name="Roles", value=", ".join(stats["roles"]) if stats["roles"] else "No roles", inline=False)
     embed.add_field(name="Message Count", value=str(stats["message_count"]), inline=False)
 
     return embed
@@ -221,12 +225,13 @@ async def increment_message_count(user_id, guild_id):
 async def update_user_stats(member):
     conn = get_database_connection()
     cursor = conn.cursor()
+    joined_at = member.joined_at.isoformat() if member.joined_at else None
     role_names = ','.join([role.name for role in member.roles if role.name != "@everyone"])
     cursor.execute('''
         INSERT OR REPLACE INTO user_stats 
         (user_id, guild_id, joined_at, roles, message_count) 
         VALUES (?, ?, ?, ?, COALESCE((SELECT message_count FROM user_stats WHERE user_id = ? AND guild_id = ?), 0))
-    ''', (member.id, member.guild.id, member.joined_at.isoformat(), role_names, member.id, member.guild.id))
+    ''', (member.id, member.guild.id, joined_at, role_names, member.id, member.guild.id))
     conn.commit()
 
 # Update User Roles
