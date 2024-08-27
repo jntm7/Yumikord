@@ -40,8 +40,15 @@ async def get_time(city):
                 timezones_response.raise_for_status()
                 timezones = await timezones_response.json()
 
-            best_match, match_score = process.extractOne(city, timezones, scorer=process.fuzz.partial_ratio)
-            if match_score < 80:
+            normalized_city = city.title()
+            best_match, match_score = process.extractOne(normalized_city, timezones, scorer=process.fuzz.partial_ratio)
+            
+            # Check if city has an associated timezone
+            if best_match not in timezones:
+                return None, f"Couldn't find the timezone for {city}. Please try again with a different city."
+
+            # Check if city match score is below 75
+            if match_score < 70:
                 return None, 'Please enter a valid city name.'
 
             async with session.get(f'https://worldtimeapi.org/api/timezone/{best_match}') as time_response:
@@ -52,6 +59,7 @@ async def get_time(city):
             current_time = datetime_object.strftime('%I:%M %p')
             
             return best_match.replace("_", " ").title(), f"{current_time}"
+        
         except Exception as e:
             return None, f"Couldn't retrieve the time for {city}. Please try again later! ({e})"
 
