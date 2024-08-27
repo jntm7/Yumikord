@@ -197,7 +197,7 @@ async def get_hackernews() -> str:
 
                 post_time = datetime.fromtimestamp(time, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
 
-                return f"__Trending Hacker News Story:__\n**{title}**\nPoints: {score} Posted: {post_time}\n{url}\n<{hackernews_url}>"
+                return f"__Trending Hacker News Story:__\n**{title}**\n{url}\nPoints: {score} || Posted: {post_time}\n<{hackernews_url}>"
             
     except Exception as e:
         return f"Couldn't retrieve any top stories from Hacker News right now. Please try again later! ({e})"
