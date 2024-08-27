@@ -1,8 +1,9 @@
 import aiohttp
 import asyncio
 import json
+import random
 from fuzzywuzzy import process
-from datetime import datetime
+from datetime import datetime, timezone
 from googletrans import Translator
 
 # World Weather API
@@ -183,13 +184,20 @@ async def get_hackernews() -> str:
                 if not top_stories:
                     return "Couldn't retrieve any top stories from Hacker News right now. Please try again later!"
 
-                id = top_stories[0]
+                id = random.choice(top_stories)
                 async with session.get(f"https://hacker-news.firebaseio.com/v0/item/{id}.json") as story_response:
                     story_response.raise_for_status()
                     story_data = await story_response.json()
 
                 title = story_data.get('title', 'no title')
+                score = story_data.get('score', 0)
+                time = story_data.get('time', 0)
                 url = story_data.get('url', 'no url')
-                return f"Top Hacker News Story:\n {title}\n {url}"
+                hackernews_url = f"https://news.ycombinator.com/item?id={id}"
+
+                post_time = datetime.fromtimestamp(time, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+
+                return f"__Trending Hacker News Story:__\n**{title}**\nPoints: {score} Posted: {post_time}\n{url}\n<{hackernews_url}>"
+            
     except Exception as e:
         return f"Couldn't retrieve any top stories from Hacker News right now. Please try again later! ({e})"
