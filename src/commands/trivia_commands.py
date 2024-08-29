@@ -1,6 +1,7 @@
 import requests
 import random
 import html
+from discord.ext import commands
 
 def handle_trivia_command(command):
     trivia_game = TriviaGame()
@@ -8,7 +9,7 @@ def handle_trivia_command(command):
     return response
 
 # Trivia
-class TriviaGame:
+class TriviaGame(commands.Cog):
     def __init__(self):
         self.active_game = False
         self.question = None
@@ -49,3 +50,6 @@ class TriviaGame:
                 return False, "Please respond with a valid number."
         else:
             return False, "There is no active game. Please start a new game with `play.trivia`."
+        
+def setup(bot):
+    bot.add_cog(TriviaGame(bot))

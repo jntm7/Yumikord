@@ -5,14 +5,15 @@ from utils.audio_player import AudioPlayer
 class AudioCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.audio_player = AudioPlayer()
+        self.audio_player = AudioPlayer(bot)
 
     @commands.command(name='play')
     async def play(self, ctx, *, link_to_play: str = None):
         if ctx.author.voice and ctx.author.voice.channel:
             if link_to_play:
                 guild_id = ctx.guild.id
-                await self.audio_player.play_audio(link_to_play, guild_id, ctx.channel)
+                response = await self.audio_player.play_audio(link_to_play, guild_id, ctx.channel)
+                await ctx.send(response)
             else:
                 await ctx.send("Please provide a valid URL to play.")
         else:
@@ -63,3 +64,6 @@ class AudioCommands(commands.Cog):
         else:
             queue_message = "The queue is currently empty."
         await ctx.send(queue_message)
+
+def setup(bot):
+    bot.add_cog(AudioCommands(bot))

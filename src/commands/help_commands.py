@@ -75,5 +75,5 @@ class HelpCommands(commands.Cog):
         for embed in embeds:
             await channel.send(embed=embed)
 
-def get_help(bot):
+def setup(bot):
     bot.add_cog(HelpCommands(bot))

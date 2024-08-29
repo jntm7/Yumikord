@@ -64,3 +64,6 @@ class GeneralCommands(commands.Cog):
     async def get_hackernews(self, ctx):
         top_story = await get_hackernews()
         await ctx.send(top_story)
+
+def setup(bot):
+    bot.add_cog(GeneralCommands(bot))

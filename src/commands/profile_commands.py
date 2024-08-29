@@ -1,5 +1,4 @@
 from discord.ext import commands
-import random
 from models.user_profile import get_leaderboard, display_leaderboard_embed, display_profile
 
 class ProfileCommands(commands.Cog):
@@ -18,3 +17,6 @@ class ProfileCommands(commands.Cog):
             await channel.send(embed=leaderboard_embed)
         else:
             await channel.send("No leaderboard data available.")
+
+def setup(bot):
+    bot.add_cog(ProfileCommands(bot))

@@ -42,3 +42,6 @@ class ReminderCommands(commands.Cog):
             return delay, message
         except (ValueError, IndexError):
             return None, None
+
+def setup(bot):
+    bot.add_cog(ReminderCommands(bot))

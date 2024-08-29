@@ -27,3 +27,6 @@ class StatsCommands(commands.Cog):
             await channel.send(embed=embed)
         else:
             await channel.send(f"No stats available for user {target_user.name}")
+
+def setup(bot):
+    bot.add_cog(StatsCommands(bot))

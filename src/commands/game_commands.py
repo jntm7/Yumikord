@@ -1,6 +1,5 @@
 from discord.ext import commands
 from src.utils.game_logic import play_rps, start_guesser, play_guesser, roll_dice, flip_coin, generate_random_number
-import random
 
 # Game Commands
 class GameCommands(commands.Cog):

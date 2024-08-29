@@ -16,3 +16,6 @@ class UtilityCommands(commands.Cog):
     async def calculate_command(self, ctx, *, user_input: str):
         result = calculator(user_input)
         await ctx.send(result)
+
+def setup(bot):
+    bot.add_cog(UtilityCommands(bot))

@@ -77,3 +77,6 @@ class FunCommands(commands.Cog):
     async def emoji(self, ctx, *, text: str):
         translated_text = await translate_to_emoji(text)
         await ctx.send(translated_text)
+
+def setup(bot):
+    bot.add_cog(FunCommands(bot))
