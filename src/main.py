@@ -1,15 +1,18 @@
 import asyncio
 import signal
 import discord
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from discord import Intents, Message
 from discord.ext.commands import Bot
 from responses import get_response, setup_responses
+
 from config import TOKEN
-from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, increment_message_count, create_stats_table, update_user_stats, update_user_roles)
-from commands.audio_commands import AudioCommands
-from commands.profile_commands import ProfileCommands
-from commands.help_commands import HelpCommands
-from commands.stats_commands import StatsCommands
+
+from models.user_profile import (get_database_connection, initialize_profile, add_xp_and_coins, create_profile_table, create_bets_table, create_stats_table, update_user_stats, update_user_roles)
 
 intents: Intents = Intents.default()
 intents.message_content = True
@@ -22,22 +25,6 @@ async def setup_database():
 
 bot = Bot(command_prefix="!",intents=intents)
 
-# Initiate
-@bot.event
-async def on_ready():
-    print(f'{bot.user} is now running!')
-
-    await setup_database()
-
-    setup_responses(bot)
-
-    bot.remove_command('help')
-
-    await bot.add_cog(AudioCommands(bot))
-    await bot.add_cog(ProfileCommands(bot))
-    await bot.add_cog(HelpCommands(bot))
-    await bot.add_cog(StatsCommands(bot))
-
 # XP & Coin Rate
 XP_RATE = 5
 COIN_RATE = 10
@@ -45,29 +32,59 @@ async def award_xp_and_coins(user_id, username):
     await initialize_profile(user_id, username)
     await add_xp_and_coins(user_id, XP_RATE, COIN_RATE)
 
-# Message
+# Load Cogs
+async def setup_bot():
+    bot.remove_command('help')
+    cogs_dir = "src/commands"
+    
+    for filename in os.listdir(cogs_dir):
+        if filename.endswith(".py") and filename != "__init__.py":
+            cog_name = filename[:-3]
+            try:
+                await bot.load_extension(f"src.commands.{cog_name}")
+                print(f"[cog] {cog_name} loaded successfully...")
+            except Exception as e:
+                print(f"Error loading cog {cog_name}: {e}")
+
+# Initialize
+@bot.event
+async def on_ready():
+    print(f'{bot.user} is initializing...')
+
+    await setup_database()
+    await setup_bot()
+
+    setup_responses(bot)
+
+    print(f'{bot.user} setup completed...')
+    print(f'{bot.user} is now running!')
+
+# Message Handling
 @bot.event
 async def on_message(message: Message) -> None:
 
+    # Check if the message is from the bot
     if message.author == bot.user:
         return
     
+    # Check if the message is a system message
     if message.type != discord.MessageType.default:
         return
 
-    await increment_message_count(message.author.id, message.guild.id)
+    # Check if the message is a command
+    if not message.content.startswith(bot.command_prefix):
+        response = await get_response(message.content, message.channel, message.author.id)
+        if response:
+            await message.channel.send(response)
 
-    response = await get_response(message.content, message.channel, message.author.id)
-    if response:
-        await message.channel.send(response)
+    await award_xp_and_coins(message.author.id, str(message.author))
+    await bot.process_commands(message)
 
     username: str = str(message.author)
     user_message: str = message.content
     channel = message.channel
 
     print(f'[{channel}] {username}: "{user_message}"')
-
-    await award_xp_and_coins(message.author.id, username)
 
 # Member Join
 @bot.event
@@ -82,7 +99,7 @@ async def on_member_update(before, after):
 
 # Disconnect
 def signal_handler(_, __):
-    print("Shutting down...")
+    print(f'{bot.user} and connections are shutting down...')
     conn = get_database_connection()
     conn.close()
     
@@ -99,6 +116,7 @@ signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
 def main():
+    bot.loop.run_until_complete(setup_bot())
     bot.run(TOKEN)
 
 if __name__ == '__main__':
