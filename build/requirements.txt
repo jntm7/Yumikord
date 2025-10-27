@@ -1,6 +1,6 @@
 requests==2.32.2
 fuzzywuzzy==0.18.0
-googletrans==4.0.0-rcl
+googletrans==4.0.2
 discord==2.3.2
 asyncio==3.4.3
 yt-dlp==2024.7.7
