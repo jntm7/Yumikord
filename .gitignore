@@ -7,7 +7,7 @@ venv/
 *.db
 
 # Ignore Discord API key
-/build/.env
+build/.env
 
 # Node.js
 node_modules/
