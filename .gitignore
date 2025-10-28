@@ -6,6 +6,9 @@ venv/
 *.swp
 *.db
 
+# Ignore Discord API key
+/build/.env
+
 # Node.js
 node_modules/
 npm-debug.log
